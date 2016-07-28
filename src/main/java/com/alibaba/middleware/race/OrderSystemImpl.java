@@ -11,6 +11,7 @@ import com.alibaba.middleware.race.storage.*;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
@@ -31,6 +32,8 @@ public class OrderSystemImpl implements OrderSystem {
     final AtomicLong queryOrderByBuyerCount = new AtomicLong(0);
     final AtomicLong queryOrderCount = new AtomicLong(0);
     final AtomicLong queryOrderByGoodCount = new AtomicLong(0);
+
+    private CountDownLatch indexDoneSignal;
 
     //根据三个表里面的主键查询
 
@@ -143,7 +146,7 @@ public class OrderSystemImpl implements OrderSystem {
          * 五个创建索引线程
          */
 
-        final CountDownLatch indexDoneSignal = new CountDownLatch(5);
+        indexDoneSignal = new CountDownLatch(5);
         new Thread(new BuyerPartionBuildThread(nBuyerRemain,indexDoneSignal)).start();
         new Thread(new BuyerTimeOrderPartionBuildThread(nOrderRemain,indexDoneSignal)).start();
         new Thread(new GoodPartionBuildThread(nGoodRemain,indexDoneSignal)).start();
@@ -166,9 +169,9 @@ public class OrderSystemImpl implements OrderSystem {
         //    }
         //}).start();
 
-        doneSignal.await();
+        doneSignal.await(59, TimeUnit.MINUTES);
         LOG.info("Finish copy file. It means all origin file have moved to disk");
-        indexDoneSignal.await();
+        indexDoneSignal.await(59,TimeUnit.MINUTES);
         LOG.info("FINISHINDEX , finish create all index. ");
         fileManager.finishConstruct();
         LOG.info("ConstructAllFinish!!!!!!  Congratulate!!!");
@@ -269,6 +272,11 @@ public class OrderSystemImpl implements OrderSystem {
 
     @Override
     public Result queryOrder(long orderId, Collection<String> keys) {
+        try {
+            indexDoneSignal.await();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         queryOrderCount.incrementAndGet();
         Row orderData = indexNameSpace.queryOrderDataByOrderId(orderId);
         if(orderData == null){
@@ -293,6 +301,11 @@ public class OrderSystemImpl implements OrderSystem {
 
     @Override
     public Iterator<Result> queryOrdersByBuyer(long startTime, long endTime, String buyerid) {
+        try{
+            indexDoneSignal.await();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         queryOrderByBuyerCount.incrementAndGet();
         final Deque<Row> orderDatas = indexNameSpace.queryOrderDataByBuyerCreateTime(startTime,endTime,buyerid);
 
@@ -320,6 +333,11 @@ public class OrderSystemImpl implements OrderSystem {
 
     @Override
     public Iterator<Result> queryOrdersBySaler(String salerid, String goodid, final Collection<String> keys) {
+        try{
+            indexDoneSignal.await();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         queryOrderBySalerCount.incrementAndGet();
         final Row goodData = indexNameSpace.queryGoodDataByGoodId(goodid);
         final Queue<Row> orderDatas;
@@ -357,6 +375,11 @@ public class OrderSystemImpl implements OrderSystem {
 
     @Override
     public KeyValue sumOrdersByGood(String goodid, String key) {
+        try{
+            indexDoneSignal.await();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         queryOrderByGoodCount.incrementAndGet();
         final Queue<Row> orderDatas = indexNameSpace.queryOrderDataByGoodid(goodid);
         List<ResultImpl> allData = new ArrayList<>(orderDatas.size());
@@ -405,16 +428,6 @@ public class OrderSystemImpl implements OrderSystem {
 
         }
         return null;
-    }
-
-    private Collection<String> getFolderFiles(Collection<String> files, String storeFolder) {
-        Collection<String> floderFiles = new ArrayList<>();
-        for (String file : files) {
-            if (file.startsWith(storeFolder)) {
-                floderFiles.add(file);
-            }
-        }
-        return floderFiles;
     }
 
     private HashSet<String> createQueryKeys(Collection<String> keys) {
