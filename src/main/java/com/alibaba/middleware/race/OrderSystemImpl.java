@@ -73,6 +73,7 @@ public class OrderSystemImpl implements OrderSystem {
      */
     @Override
     public void construct(final Collection<String> orderFiles, final Collection<String> buyerFiles, final Collection<String> goodFiles, final Collection<String> storeFolders) throws IOException, InterruptedException {
+        LOG.info("这是一个构建需要两个小时的版本");
         /**
          * 三个文件一个线程
          */
