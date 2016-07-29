@@ -5,6 +5,7 @@ import com.alibaba.middleware.race.cache.ConcurrentLruCacheForBigData;
 import com.alibaba.middleware.race.cache.LRUCache;
 import com.alibaba.middleware.race.decoupling.FlushUtil;
 import com.alibaba.middleware.race.decoupling.QuickSort;
+import com.alibaba.middleware.race.decoupling.ShellSort;
 import com.alibaba.middleware.race.models.Row;
 
 import java.io.Serializable;
@@ -68,7 +69,7 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
     /**
      * 执行quickSort
      */
-    private QuickSort<T> quickSort;
+    private ShellSort<T> shellSort;
 
     /**
      * 排序锁,只有一个线程能够执行排序任务
@@ -105,7 +106,7 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
             System.exit(-1);
         }
         elementCount = 0;
-        quickSort = new QuickSort<>();
+        shellSort = new ShellSort<>();
         sortLock = new ReentrantLock();
     }
 
@@ -141,7 +142,7 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    List<T> sortedList = quickSort.quicksort(tmp);
+                    List<T> sortedList = shellSort.shellsort(tmp);
                     sortedKeysInDisk.add(flushUtil.moveListDataToDisk(sortedList));
                     tmp.clear();
                     boolean flag = keysCacheQueue.offer(tmp);
@@ -169,7 +170,7 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
         /**
          * 清空当前缓存队列到硬盘中,因为有两个缓存队列,一个在另外的线程中执行,所以写下面的代码出现bug 的可能性比较大
          */
-        List<T> sortedList = quickSort.quicksort(currentCache);
+        List<T> sortedList = shellSort.shellsort(currentCache);
         sortedKeysInDisk.add(flushUtil.moveListDataToDisk(sortedList));
         /**
          * 等待排序线程被执行完

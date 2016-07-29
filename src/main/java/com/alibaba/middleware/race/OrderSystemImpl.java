@@ -170,11 +170,11 @@ public class OrderSystemImpl implements OrderSystem {
         //    }
         //}).start();
 
+        indexDoneSignal.await(59,TimeUnit.MINUTES);
         doneSignal.await(59, TimeUnit.MINUTES);
         LOG.info("Finish copy file. It means all origin file have moved to disk");
-        indexDoneSignal.await(59,TimeUnit.MINUTES);
         LOG.info("FINISHINDEX , finish create all index. ");
-        fileManager.finishConstruct();
+        //fileManager.finishConstruct();
         LOG.info("ConstructAllFinish!!!!!!  Congratulate!!!");
     }
 
