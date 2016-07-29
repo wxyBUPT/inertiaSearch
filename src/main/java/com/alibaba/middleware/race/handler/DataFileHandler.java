@@ -35,10 +35,13 @@ public abstract class DataFileHandler{
             RandomAccessFile raf = new RandomAccessFile(file, "r");
             FileChannel channel = raf.getChannel();
 
+            BufferedReader bfr = createReader(file);
+
+
             /**
              * 当前extent 的开始位置
              */
-            Long currentExtentPosition = raf.getFilePointer();
+            Long currentExtentPosition = 0L;
 
             /**
              * 当前extent 的逻辑标号
@@ -49,57 +52,76 @@ public abstract class DataFileHandler{
             /**
              * 当前行数的位置
              */
-            Long currentLinePosition = raf.getFilePointer();
+            Long currentLinePosition = 0L;
+
+
+            /**
+             * 当前extent 的位置
+             */
+            Long currentExtentEnd = 0L;
 
             /**
              * 当前待处理的数据行
              */
-            String line = raf.readLine();
+            String line = bfr.readLine();
+
+            /**
+             * 当前extent 的位置不包括最后一个换行符
+             */
+            currentExtentEnd = currentExtentEnd + line.length();
 
             /**
              * 在一个extent 中已经处理的行数
              */
             Integer lineCount = 0;
             while (line!=null){
-                if(lineCount>=10000){
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("currentExtent size is : " ).append(raf.getFilePointer() - currentExtentPosition);
+                if(lineCount>=8000){
                     originalExtentManager.putExtent(
                             new OrigionExtent(
                                     channel,
                                     currentExtentPosition,
-                                    raf.getFilePointer()-currentExtentPosition,
+                                    currentExtentEnd - currentExtentPosition,
                                     currentExtentNum)
                     );
-
                     /**
                      * 更新当前extent 的位置,同时更新当前extent 的逻辑标号
                      */
-                    currentExtentPosition = raf.getFilePointer();
+                    currentExtentPosition = currentExtentEnd + 2;
                     currentExtentNum = originalExtentManager.applyExtentNo();
                 }
+                int lineByteSize = line.getBytes("UTF-8").length;
                 DiskLoc diskLoc = new DiskLoc(currentExtentNum,
                         currentLinePosition.intValue()-currentExtentPosition.intValue(),
-                        StoreType.NOTDEFINED,line.length());
-                currentLinePosition = raf.getFilePointer();
+                        StoreType.NOTDEFINED,lineByteSize);
+                /**
+                 * 当前位置越过一个 /r
+                 */
+                currentExtentEnd = currentLinePosition + lineByteSize;
+                currentLinePosition = currentLinePosition + lineByteSize + 1;
                 handleLine(line,diskLoc);
-                line = raf.readLine();
+                line = bfr.readLine();
             }
 
             /**
              * 要定位最后的extent
              */
-            originalExtentManager.putExtent(
-                    new OrigionExtent(
-                            channel,
-                            currentExtentPosition,
-                            raf.getFilePointer()-currentExtentPosition,
-                            currentExtentNum
-                    )
-            );
+            if(currentExtentPosition<channel.size()) {
+                originalExtentManager.putExtent(
+                        new OrigionExtent(
+                                channel,
+                                currentExtentPosition,
+                                currentExtentEnd - currentExtentPosition,
+                                currentExtentNum
+                        )
+                );
+            }
         }catch (Exception e){
             e.printStackTrace();
             System.exit(-1);
         }
+    }
+
+    private BufferedReader createReader(String file) throws FileNotFoundException {
+        return new BufferedReader(new FileReader(file));
     }
 }
