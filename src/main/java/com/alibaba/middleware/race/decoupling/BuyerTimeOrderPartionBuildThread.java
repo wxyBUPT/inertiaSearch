@@ -28,19 +28,8 @@ public class BuyerTimeOrderPartionBuildThread extends  PartionBuildThread<Compar
 
     @Override
     protected void createBPlusTree() {
-        int size = myPartions.size();
-        CountDownLatch countDownLatch = new CountDownLatch(size);
         for(Map.Entry<Integer,IndexPartition<ComparableKeysByBuyerCreateTimeOrderId>> entry:myPartions.entrySet()){
-            entry.getValue().merageAndBuildMe(countDownLatch);
-        }
-        /**
-         * 等待所有索引被创建完毕
-         */
-        try {
-            countDownLatch.await(60, TimeUnit.MINUTES);
-        }catch (Exception e){
-            e.printStackTrace();
-            System.exit(-1);
+            entry.getValue().merageAndBuildMe();
         }
     }
 }

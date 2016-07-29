@@ -273,11 +273,6 @@ public class OrderSystemImpl implements OrderSystem {
 
     @Override
     public Result queryOrder(long orderId, Collection<String> keys) {
-        try {
-            indexDoneSignal.await();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
         queryOrderCount.incrementAndGet();
         Row orderData = indexNameSpace.queryOrderDataByOrderId(orderId);
         if(orderData == null){
@@ -302,11 +297,6 @@ public class OrderSystemImpl implements OrderSystem {
 
     @Override
     public Iterator<Result> queryOrdersByBuyer(long startTime, long endTime, String buyerid) {
-        try{
-            indexDoneSignal.await();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
         queryOrderByBuyerCount.incrementAndGet();
         final Deque<Row> orderDatas = indexNameSpace.queryOrderDataByBuyerCreateTime(startTime,endTime,buyerid);
 
@@ -334,11 +324,6 @@ public class OrderSystemImpl implements OrderSystem {
 
     @Override
     public Iterator<Result> queryOrdersBySaler(String salerid, String goodid, final Collection<String> keys) {
-        try{
-            indexDoneSignal.await();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
         queryOrderBySalerCount.incrementAndGet();
         final Row goodData = indexNameSpace.queryGoodDataByGoodId(goodid);
         final Queue<Row> orderDatas;
@@ -376,11 +361,6 @@ public class OrderSystemImpl implements OrderSystem {
 
     @Override
     public KeyValue sumOrdersByGood(String goodid, String key) {
-        try{
-            indexDoneSignal.await();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
         queryOrderByGoodCount.incrementAndGet();
         final Queue<Row> orderDatas = indexNameSpace.queryOrderDataByGoodid(goodid);
         List<ResultImpl> allData = new ArrayList<>(orderDatas.size());

@@ -27,20 +27,11 @@ public class GoodPartionBuildThread extends PartionBuildThread<ComparableKeysByG
 
     @Override
     protected void createBPlusTree() {
-        int size = myPartions.size();
-        CountDownLatch countDownLatch = new CountDownLatch(size);
         for(Map.Entry<Integer,IndexPartition<ComparableKeysByGoodId>> entry:myPartions.entrySet()){
-            entry.getValue().merageAndBuildMe(countDownLatch);
-        }
-
-        /**
-         * 等待所有索引被创建文笔
-         */
-        try{
-            countDownLatch.await(60, TimeUnit.MINUTES);
-        }catch (Exception e){
-            e.printStackTrace();
-            System.exit(-1);
+            /**
+             * 在partion 中创建btree
+             */
+            entry.getValue().merageAndBuildMe();
         }
     }
 }

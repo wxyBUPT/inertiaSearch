@@ -108,6 +108,7 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
         elementCount = 0;
         shellSort = new ShellSort<>();
         sortLock = new ReentrantLock();
+        rootIndex = null;
     }
 
     /**
@@ -164,9 +165,15 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
      * 归并合并 sortedKeysInDisk,并创建b树
      * 由于partion 之间是没有共享数据的,所以以线程为单位执行
      * 当前是两路归并排序,
-     * @param countDownLatch
      */
-    public void merageAndBuildMe(final CountDownLatch countDownLatch){
+    public synchronized void merageAndBuildMe(){
+        /**
+         * 避免重复创建
+         */
+        if(rootIndex!=null){
+            System.out.println("很开心,查询阶段已经帮我创建好了bplus,所以我不用再创建索引");
+            return ;
+        }
         /**
          * 清空当前缓存队列到硬盘中,因为有两个缓存队列,一个在另外的线程中执行,所以写下面的代码出现bug 的可能性比较大
          */
@@ -181,29 +188,21 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
             e.printStackTrace();
             System.exit(-1);
         }
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                /**
-                 * sortedKeysInDisk 中所有的值进行归并排序
-                 */
-                while(sortedKeysInDisk.size()>1){
-                    LinkedList<DiskLoc> diskLocs = sortedKeysInDisk.poll();
-                    LinkedList<DiskLoc> diskLocs1 = sortedKeysInDisk.poll();
-                    IndexLeafNodeIterator<T> iterator = new IndexLeafNodeIterator<>(diskLocs,indexExtentManager);
-                    IndexLeafNodeIterator<T> iterator1 = new IndexLeafNodeIterator<>(diskLocs1,indexExtentManager);
-                    sortedKeysInDisk.add(flushUtil.mergeIterator(iterator,iterator1));
-                }
-                if(sortedKeysInDisk.size()<1){
-                    System.out.println("完成归并排序出现了一些bug");
-                    System.exit(-1);
-                }
-                DiskLoc diskLoc = flushUtil.buildBPlusTree(sortedKeysInDisk.poll());
-                rootIndex = indexExtentManager.getIndexNodeFromDiskLocForInsert(diskLoc);
-                countDownLatch.countDown();
-            }
-        }).start();
-    }
+
+        while(sortedKeysInDisk.size()>1){
+            LinkedList<DiskLoc> diskLocs = sortedKeysInDisk.poll();
+            LinkedList<DiskLoc> diskLocs1 = sortedKeysInDisk.poll();
+            IndexLeafNodeIterator<T> iterator = new IndexLeafNodeIterator<>(diskLocs,indexExtentManager);
+            IndexLeafNodeIterator<T> iterator1 = new IndexLeafNodeIterator<>(diskLocs1,indexExtentManager);
+            sortedKeysInDisk.add(flushUtil.mergeIterator(iterator,iterator1));
+        }
+        if(sortedKeysInDisk.size()<1){
+            System.out.println("完成归并排序出现了一些bug");
+            System.exit(-1);
+        }
+        DiskLoc diskLoc = flushUtil.buildBPlusTree(sortedKeysInDisk.poll());
+        rootIndex = indexExtentManager.getIndexNodeFromDiskLocForInsert(diskLoc);
+}
 
 
 
@@ -212,7 +211,11 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
      * @param t
      * @return
      */
-    public Row queryByKey(T t){
+    public synchronized Row queryByKey(T t){
+        if(rootIndex==null){
+            System.out.println("查询阶段创建bplus");
+            merageAndBuildMe();
+        }
         IndexNode<T> indexNode = rootIndex;
         while(!indexNode.isLeafNode()){
             DiskLoc diskLoc = indexNode.search(t);
@@ -230,7 +233,17 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
         return originalExtentManager.getRowFromDiskLoc(diskLoc);
     }
 
-    public Deque<Row> rangeQuery(T startKey,T endKey) {
+    /**
+     * 因为范围查询和只查询一个元素不会再相同的partion 中同时出现
+     * @param startKey
+     * @param endKey
+     * @return
+     */
+    public synchronized Deque<Row> rangeQuery(T startKey,T endKey) {
+        if(rootIndex==null){
+            System.out.println("查询阶段创建bplus");
+            merageAndBuildMe();
+        }
         /**
          * 对磁盘中进行层序遍历
          */
