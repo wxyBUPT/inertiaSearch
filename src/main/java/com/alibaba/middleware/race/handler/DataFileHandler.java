@@ -76,6 +76,7 @@ public abstract class DataFileHandler{
             Integer lineCount = 0;
             while (line!=null){
                 if(lineCount>=1000000){
+                    LOG.info("创建新的Extent ,标号是 + " + currentExtentNum);
                     originalExtentManager.putExtent(
                             new OrigionExtent(
                                     channel,
