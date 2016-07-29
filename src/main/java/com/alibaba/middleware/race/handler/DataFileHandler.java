@@ -75,7 +75,7 @@ public abstract class DataFileHandler{
              */
             Integer lineCount = 0;
             while (line!=null){
-                if(lineCount>=8000){
+                if(lineCount>=1000000){
                     originalExtentManager.putExtent(
                             new OrigionExtent(
                                     channel,
@@ -86,8 +86,9 @@ public abstract class DataFileHandler{
                     /**
                      * 更新当前extent 的位置,同时更新当前extent 的逻辑标号
                      */
-                    currentExtentPosition = currentExtentEnd + 2;
+                    currentExtentPosition = currentExtentEnd + 1;
                     currentExtentNum = originalExtentManager.applyExtentNo();
+                    lineCount = 0;
                 }
                 int lineByteSize = line.getBytes("UTF-8").length;
                 DiskLoc diskLoc = new DiskLoc(currentExtentNum,
@@ -96,6 +97,7 @@ public abstract class DataFileHandler{
                 /**
                  * 当前位置越过一个 /r
                  */
+                lineCount ++;
                 currentExtentEnd = currentLinePosition + lineByteSize;
                 currentLinePosition = currentLinePosition + lineByteSize + 1;
                 handleLine(line,diskLoc);
