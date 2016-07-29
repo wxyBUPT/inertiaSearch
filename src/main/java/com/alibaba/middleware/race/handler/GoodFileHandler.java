@@ -22,7 +22,12 @@ public class GoodFileHandler extends DataFileHandler{
         int i = line.indexOf("goodid:");
         line = line.substring(i+7);
         i = line.indexOf("\t");
-        String goodid = line.substring(0,i);
+        String goodid;
+        if(i != -1) {
+            goodid = line.substring(0, i);
+        }else {
+            goodid = line;
+        }
 
         if(goodid==null ){
             throw new RuntimeException("Bad data! goodid " + goodid  );

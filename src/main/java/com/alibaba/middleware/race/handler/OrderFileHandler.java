@@ -20,23 +20,43 @@ public class OrderFileHandler extends DataFileHandler{
         int i = line.indexOf("orderid:");
         String tmp = line.substring(i+8);
         i = tmp.indexOf("\t");
-        String orderidStr = tmp.substring(0,i);
+        String orderidStr;
+        if(i!=-1) {
+            orderidStr = tmp.substring(0, i);
+        }else {
+            orderidStr = tmp;
+        }
         Long orderid= Long.parseLong(orderidStr);
 
         i = line.indexOf("goodid:");
         tmp = line.substring(i+7);
         i = tmp.indexOf("\t");
-        String goodid = tmp.substring(0,i);
+        String goodid;
+        if(i!=-1) {
+            goodid = tmp.substring(0, i);
+        }else {
+            goodid = tmp;
+        }
 
         i = line.indexOf("buyerid:");
         tmp = line.substring(i+8);
         i = tmp.indexOf("\t");
-        String buyerid = tmp.substring(0,i);
+        String buyerid;
+        if(i!=-1) {
+            buyerid = tmp.substring(0, i);
+        }else {
+            buyerid = tmp;
+        }
 
         i = line.indexOf("createtime:");
         tmp = line.substring(i+11);
         i = tmp.indexOf("\t");
-        String createtimeStr = tmp.substring(0,i);
+        String createtimeStr;
+        if(i!=-1) {
+            createtimeStr = tmp.substring(0, i);
+        }else {
+            createtimeStr = tmp;
+        }
         Long createtime = Long.parseLong(createtimeStr);
 
         ComparableKeysByOrderId orderIdKeys = new ComparableKeysByOrderId(orderid,diskLoc);

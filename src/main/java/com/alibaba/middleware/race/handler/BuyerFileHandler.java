@@ -19,7 +19,12 @@ public class BuyerFileHandler extends DataFileHandler{
         int i = line.indexOf("buyerid:");
         line = line.substring(i+8);
         i = line.indexOf("\t");
-        String buyerid = line.substring(0,i);
+        String buyerid ;
+        if(i!=-1) {
+            buyerid = line.substring(0, i);
+        }else {
+            buyerid = line;
+        }
         /**
          * Put index info to queue
          */
