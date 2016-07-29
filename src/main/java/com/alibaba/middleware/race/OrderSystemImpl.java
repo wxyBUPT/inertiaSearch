@@ -554,7 +554,27 @@ public class OrderSystemImpl implements OrderSystem {
                 System.out.println(os.queryOrder(609670049L,keys));
                 keys.clear();
                 keys.add("amount");
+                System.out.println("根据good 字段求和,good 字段是 al-96e5-7fac3721d4b9");
                 System.out.println(os.sumOrdersByGood("al-96e5-7fac3721d4b9","amount"));
+
+                Long orderId = 590107063L;
+                System.out.println("查询订单号为 " + orderId + "的订单");
+                keys.clear();
+                keys.add("a_g_12146");
+                System.out.println(os.queryOrder(orderId,keys));
+
+                String goodId = "aye-9c37-838aa50d1f1e";
+                System.out.println("查询goodid 的和");
+                System.out.println(os.sumOrdersByGood(goodId,"a_g_5814"));
+
+                Long startTime = 1462018520L;
+                Long endTime = 1473999229L;
+                String buyerId = "wx-a0e0-6bda77db73ca";
+                System.out.println("查询buyer 在一段时间内的订单信息");
+                Iterator<Result> is = os.queryOrdersByBuyer(startTime,endTime,buyerId);
+                while(is.hasNext()) {
+                    System.out.println(is.next());
+                }
             }
         }
     }

@@ -16,15 +16,21 @@ public class BuyerFileHandler extends DataFileHandler{
     void handleLine(String line, DiskLoc diskLoc) throws IOException, OrderSystem.TypeException, InterruptedException {
         diskLoc.setStoreType(StoreType.BUYERLINE);
 
-        int i = line.indexOf("buyerid:");
-        line = line.substring(i+8);
-        i = line.indexOf("\t");
-        String buyerid ;
-        if(i!=-1) {
-            buyerid = line.substring(0, i);
-        }else {
-            buyerid = line;
+        String[] kvs = line.split("\t");
+        String buyerid = null;
+        for(String kv:kvs){
+            int p = kv.indexOf(":");
+            String key = kv.substring(0,p);
+            String value = kv.substring(p+1);
+            if(key.length()==0||value.length()==0){
+                throw new RuntimeException("Bad data: " + line);
+            }
+            if(key.compareTo("buyerid")==0){
+                buyerid = value;
+                break;
+            }
         }
+
         /**
          * Put index info to queue
          */

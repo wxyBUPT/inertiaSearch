@@ -19,14 +19,19 @@ public class GoodFileHandler extends DataFileHandler{
         /**
          * Find goodid and salerid
          */
-        int i = line.indexOf("goodid:");
-        line = line.substring(i+7);
-        i = line.indexOf("\t");
-        String goodid;
-        if(i != -1) {
-            goodid = line.substring(0, i);
-        }else {
-            goodid = line;
+        String[] kvs = line.split("\t");
+        String goodid = null;
+        for(String kv: kvs){
+            int p = kv.indexOf(":");
+            String key = kv.substring(0,p);
+            String value = kv.substring(p+1);
+            if(key.length()==0||value.length()==0){
+                throw new RuntimeException("Bad data: " + line);
+            }
+            if(key.equals("goodid")){
+                goodid = value;
+                break;
+            }
         }
 
         if(goodid==null ){

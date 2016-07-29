@@ -61,7 +61,9 @@ public abstract class DataFileHandler{
              */
             Integer lineCount = 0;
             while (line!=null){
-                if(lineCount>=100000){
+                if(lineCount>=10000){
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("currentExtent size is : " ).append(raf.getFilePointer() - currentExtentPosition);
                     originalExtentManager.putExtent(
                             new OrigionExtent(
                                     channel,
