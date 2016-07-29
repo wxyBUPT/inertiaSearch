@@ -175,7 +175,6 @@ public class OrderSystemImpl implements OrderSystem {
         LOG.info("Finish copy file. It means all origin file have moved to disk");
         LOG.info("FINISHINDEX , finish create all index. ");
         //fileManager.finishConstruct();
-        LOG.info("ConstructAllFinish!!!!!!  Congratulate!!!");
     }
 
     /**

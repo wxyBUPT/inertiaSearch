@@ -171,7 +171,7 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
          * 避免重复创建
          */
         if(rootIndex!=null){
-            System.out.println("很开心,查询阶段已经帮我创建好了bplus,所以我不用再创建索引");
+            LOG.info("bTree already build by query!");
             return ;
         }
         /**
@@ -213,7 +213,7 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
      */
     public synchronized Row queryByKey(T t){
         if(rootIndex==null){
-            System.out.println("查询阶段创建bplus");
+            LOG.info("Start build bTree in query!!!");
             merageAndBuildMe();
         }
         IndexNode<T> indexNode = rootIndex;
@@ -222,7 +222,7 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
             if(diskLoc == null )return null;
 
             IndexNode cacheNode = myLRU.get(diskLoc);
-            indexNode = cacheNode==null?indexExtentManager.getIndexNodeFromDiskLoc(diskLoc):cacheNode;
+            indexNode = cacheNode==null?indexExtentManager.getIndexNodeFromDiskLocForInsert(diskLoc):cacheNode;
             /**
              * 如果节点是非叶子节点,并且缓存中没有数据,则缓存
              */
@@ -279,7 +279,7 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
                     while (!diskLocs.isEmpty()) {
                         DiskLoc diskLoc = diskLocs.remove();
                         IndexNode cacheNode = myLRU.get(diskLoc);
-                        IndexNode indexNode = cacheNode==null?indexExtentManager.getIndexNodeFromDiskLoc(diskLoc):cacheNode;
+                        IndexNode indexNode = cacheNode==null?indexExtentManager.getIndexNodeFromDiskLocForInsert(diskLoc):cacheNode;
                         if(cacheNode==null&& !indexNode.isLeafNode()){
                             myLRU.put(diskLoc,indexNode);
                         }
