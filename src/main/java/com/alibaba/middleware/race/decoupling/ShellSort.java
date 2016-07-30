@@ -53,7 +53,7 @@ public class ShellSort <T extends Comparable<? super T>>{
         ShellSort<Integer> app = new ShellSort<>();
 
         //Generate an integer array of length 7
-        List<Integer> input = app.generateRandomNumbers(7);
+        List<Integer> input = app.generateRandomNumbers(100);
 
         //Before sort
         System.out.println(input);

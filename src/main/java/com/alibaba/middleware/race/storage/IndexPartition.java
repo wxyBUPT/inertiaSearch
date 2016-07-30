@@ -7,6 +7,7 @@ import com.alibaba.middleware.race.decoupling.FlushUtil;
 import com.alibaba.middleware.race.decoupling.QuickSort;
 import com.alibaba.middleware.race.decoupling.ShellSort;
 import com.alibaba.middleware.race.models.Row;
+import com.sun.corba.se.impl.orbutil.concurrent.SyncUtil;
 
 import java.io.Serializable;
 import java.util.*;
@@ -55,8 +56,9 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
      * 两个用于添加数据和排序的ArrayList
      * 每一个partion 会启动新的线程排序,并将排序后的索引添加到磁盘,并不会阻塞数据插入线程
      */
-    private List<T> keysCache;
+    private LinkedBlockingQueue<List<T>> keysCacheQueue;
 
+    public List<T> currentCache;
     /**
      * 当前缓存中有多少个元素
      */
@@ -73,11 +75,6 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
     private Lock sortLock ;
 
     /**
-     * 为了实现线程间数据共享,与currentCache 相交换
-     */
-    List<T> tmp;
-
-    /**
      * 构造函数
      * @param myHashCode
      */
@@ -92,7 +89,16 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
          */
         myLRU = new ConcurrentLruCacheForBigData<>(RaceConf.N_ORDER_INDEX_CACHE_COUNT);
         flushUtil = new FlushUtil<>();
-        keysCache = new ArrayList<>(RaceConf.PARTITION_CACHE_COUNT);
+        /**
+         * 队列里面只能有一个没有被填满的缓存
+         */
+        keysCacheQueue = new LinkedBlockingQueue<>(1);
+        try {
+            keysCacheQueue.add(new ArrayList<T>(RaceConf.PARTITION_CACHE_COUNT));
+            currentCache = new ArrayList<>(RaceConf.PARTITION_CACHE_COUNT);
+        }catch (Exception e){
+            e.printStackTrace();System.exit(-1);
+        }
         elementCount = 0;
         quickSort = new QuickSort<>();
         sortLock = new ReentrantLock();
@@ -117,15 +123,33 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
         //if(elementCount>=802){
         if(elementCount>=RaceConf.PARTITION_CACHE_COUNT){
             /**
-             * 对当前的元素执行快排
+             * 将数据放到戴排序的队列中,等待外部排序线程排序
              */
-            List<T> sortedList = quickSort.quicksort(keysCache);
-            sortedKeysInDisk.add(flushUtil.moveListDataToDisk(sortedList));
-            keysCache.clear();
-            elementCount=0;
+            List<T> tmp = currentCache;
+            try {
+                currentCache = keysCacheQueue.take();
+                elementCount = 0;
+            }catch (Exception e){
+                e.printStackTrace();
+                System.exit(-1);
+            }
+            new Thread(new SortThread(tmp)).start();
         }
         elementCount++;
-        keysCache.add(t);
+        currentCache.add(t);
+    }
+
+    class SortThread implements Runnable{
+        List<T> cache;
+        SortThread(List<T> cache){
+            this.cache = cache;
+        }
+        @Override
+        public void run() {
+            List<T> sortedList = quickSort.quicksort(cache);
+            sortedKeysInDisk.add(flushUtil.moveListDataToDisk(sortedList));
+            keysCacheQueue.offer(new ArrayList<T>(RaceConf.PARTITION_CACHE_COUNT));
+        }
     }
 
     /**
@@ -146,9 +170,16 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
         /**
          * 清空当前缓存队列到硬盘中,因为有两个缓存队列,一个在另外的线程中执行,所以写下面的代码出现bug 的可能性比较大
          */
-        if(keysCache.size()!=0) {
-            List<T> sortedList = quickSort.quicksort(keysCache);
-            sortedKeysInDisk.add(flushUtil.moveListDataToDisk(sortedList));
+        List<T> sortedList = quickSort.quicksort(currentCache);
+        sortedKeysInDisk.add(flushUtil.moveListDataToDisk(sortedList));
+        /**
+         * 等待排序线程执行完毕
+         */
+        try{
+            keysCacheQueue.take();
+        }catch (Exception e){
+            e.printStackTrace();
+            System.exit(-1);
         }
 
         while(sortedKeysInDisk.size()>1){
@@ -163,7 +194,8 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
             rootIndex = null;
             return;
         }
-        DiskLoc diskLoc = flushUtil.buildBPlusTree(sortedKeysInDisk.poll());
+        LinkedList<DiskLoc> diskLocs = sortedKeysInDisk.poll();
+        DiskLoc diskLoc = flushUtil.buildBPlusTree(diskLocs);
         rootIndex = indexExtentManager.getIndexNodeFromDiskLocForInsert(diskLoc);
         LOG.info("创建索引完成,HashCode 是: " + myHashCode + "rootIndex 是 : " + rootIndex);
     }
@@ -255,3 +287,4 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
         return result;
     }
 }
+

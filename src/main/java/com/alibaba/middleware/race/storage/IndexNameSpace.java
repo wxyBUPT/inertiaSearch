@@ -6,15 +6,13 @@ import com.alibaba.middleware.race.cache.ConcurrentLruCacheForBigData;
 import com.alibaba.middleware.race.cache.ConcurrentLruCacheForMidData;
 import com.alibaba.middleware.race.cache.LRUCache;
 import com.alibaba.middleware.race.codec.HashKeyHash;
+import com.alibaba.middleware.race.decoupling.FlushUtil;
 import com.alibaba.middleware.race.decoupling.PartionBuildThread;
 import com.alibaba.middleware.race.models.Row;
 import com.alibaba.middleware.race.models.comparableKeys.*;
 
 import java.io.Serializable;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -51,7 +49,6 @@ public class IndexNameSpace {
      */
     public static HashMap<Integer,IndexPartition<ComparableKeysByBuyerId>> mBuyer;
     public static HashMap<Integer,IndexPartition<ComparableKeysByGoodId>> mGood;
-
 
     private IndexNameSpace(){
         /**
@@ -138,12 +135,6 @@ public class IndexNameSpace {
                 buyerid,endTime-1,Long.MAX_VALUE,null
         );
         Integer startHashCode = HashKeyHash.hashKeyHash(startKey.hashCode());
-        Integer endHashCode = HashKeyHash.hashKeyHash(endKey.hashCode());
-        if(!startHashCode.equals(endHashCode)){
-            LOG.info("Some bug happen,this two value should hava same hash code, startKey is: " +
-            startKey + ", endKey is : " + endKey);
-            System.exit(-1);
-        }
         /**
          * 获得数据操作交给对应的partion
          */
@@ -154,12 +145,6 @@ public class IndexNameSpace {
         ComparableKeysByGoodOrderId minKey = new ComparableKeysByGoodOrderId(goodid,Long.MIN_VALUE);
         ComparableKeysByGoodOrderId maxKey = new ComparableKeysByGoodOrderId(goodid,Long.MAX_VALUE);
         Integer minHash = HashKeyHash.hashKeyHash(minKey.hashCode());
-        Integer maxHash = HashKeyHash.hashKeyHash(maxKey.hashCode());
-        if(!minHash.equals(maxHash)){
-            LOG.info("Some bug happen,this two value should have same hash code, minKey is : "
-            + minHash + ", maxKey is : " + maxHash);
-            System.exit(-1);
-        }
         /**
          * 获得数据的操作同样交给对应的partion
          */

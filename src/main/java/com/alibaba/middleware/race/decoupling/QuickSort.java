@@ -90,7 +90,7 @@ public class QuickSort<T extends Comparable<? super T>> {
         QuickSort<Integer> app = new QuickSort<>();
 
         //Generate an integer array of length 7
-        List<Integer> input = app.generateRandomNumbers(7);
+        List<Integer> input = app.generateRandomNumbers(1000);
 
         //Before sort
         System.out.println(input);

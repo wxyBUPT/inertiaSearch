@@ -42,7 +42,7 @@ public class ComparableKeysByGoodOrderId implements Indexable,Comparable<Compara
 
     @Override
     public String toString(){
-        return "ComparableKeysByGoodOrderId: goodId: " + goodId + "orderId " + orderId;
+        return "ComparableKeysByGoodOrderId: goodId: " + goodId + ", orderId " + orderId;
     }
 
     @Override
