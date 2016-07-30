@@ -84,7 +84,7 @@ public abstract class PartionBuildThread <T extends Comparable<? super T> & Seri
                     continue;
                 }
                 insertKeys(keys);
-                if(totalInsertCount%10000==0){
+                if(totalInsertCount%1000000==0){
                     LOG.info(getInfo());
                 }
             }catch (Exception e){
