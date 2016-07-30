@@ -7,7 +7,6 @@ import com.alibaba.middleware.race.decoupling.FlushUtil;
 import com.alibaba.middleware.race.decoupling.QuickSort;
 import com.alibaba.middleware.race.decoupling.ShellSort;
 import com.alibaba.middleware.race.models.Row;
-import com.sun.corba.se.impl.orbutil.concurrent.SyncUtil;
 
 import java.io.Serializable;
 import java.util.*;
@@ -78,6 +77,8 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
      * 构造函数
      * @param myHashCode
      */
+
+    private Long totalCount;
     public IndexPartition(int myHashCode){
         indexExtentManager = IndexExtentManager.getInstance();
         originalExtentManager = OriginalExtentManager.getInstance();
@@ -103,13 +104,19 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
         quickSort = new QuickSort<>();
         sortLock = new ReentrantLock();
         rootIndex = null;
+        totalCount = 0L;
     }
 
     public String getInfo(){
         StringBuilder sb = new StringBuilder();
         sb.append("My hashCode is " + myHashCode);
         sb.append("My root is " + rootIndex);
+        sb.append("Total Key count is " + totalCount);
         return sb.toString();
+    }
+
+    public Long getTotalCount(){
+        return totalCount;
     }
 
     /**
@@ -117,6 +124,7 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
      * @param t
      */
     public void addKey(T t){
+        totalCount ++;
         /**
          * 如果当前缓存元素个数满
          */
@@ -179,7 +187,10 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
         while(sortedKeysInDisk.size()>1){
             System.out.println(sortedKeysInDisk.size());
             List<Iterator<T>> branchs = new ArrayList<>();
-            for(int i = 0;i<8;i++){
+            /**
+             * 做100路的归并排序
+             */
+            for(int i = 0;i<100;i++){
                 LinkedList<DiskLoc> diskLocs = sortedKeysInDisk.poll();
                 if(diskLocs!=null){
                     branchs.add(new IndexLeafNodeIterator<T>(diskLocs,indexExtentManager));

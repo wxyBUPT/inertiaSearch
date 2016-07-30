@@ -84,6 +84,9 @@ public abstract class PartionBuildThread <T extends Comparable<? super T> & Seri
                     continue;
                 }
                 insertKeys(keys);
+                if(totalInsertCount%10000==0){
+                    LOG.info(getInfo());
+                }
             }catch (Exception e){
                 e.printStackTrace();
                 System.exit(-1);
@@ -109,6 +112,6 @@ public abstract class PartionBuildThread <T extends Comparable<? super T> & Seri
     protected abstract void createBPlusTree();
 
     public String getInfo(){
-        return "element count insert: " + totalInsertCount;
+        return "TotalInsertCount:  " + totalInsertCount;
     }
 }

@@ -67,19 +67,33 @@ public class IndexNameSpace {
             mGood.put(i,new IndexPartition<ComparableKeysByGoodId>(i));
         }
 
-        //new Thread(new Runnable() {
-        //    @Override
-        //    public void run() {
-        //        while(true){
-        //            try {
-        //                Thread.sleep(3000);
-        //            }catch (Exception e){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(true){
+                    try {
+                        Thread.sleep(60000);
+                    }catch (Exception e){
 
-        //            }
-        //            LOG.info(mOrderPartion.get(381).getInfo());
-        //        }
-        //    }
-        //}).start();
+                    }
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("orderPartionElementCount is : " ).append(calculatePartionTotalCount(mOrderPartion));
+                    sb.append(", buyerPartionElementCount is : ").append(calculatePartionTotalCount(mBuyer));
+                    sb.append(", goodPartionElementCount is : ").append(calculatePartionTotalCount(mGood));
+                    sb.append(", buyerCreateTimeOrderPartionCount is : ").append(calculatePartionTotalCount(mBuyerCreateTimeOrderPartion));
+                    sb.append(", goodOrderPartionCount is : ").append(calculatePartionTotalCount(mGoodOrderPartions));
+                    LOG.info(sb.toString());
+                }
+            }
+        }).start();
+    }
+
+    private  <T extends Comparable<? super T>&Indexable&Serializable> Long calculatePartionTotalCount(HashMap<Integer,IndexPartition<T>> hashMap){
+        Long count = 0L;
+        for(Map.Entry<Integer,IndexPartition<T>> entry:hashMap.entrySet()){
+            count += entry.getValue().getTotalCount();
+        }
+        return count;
     }
 
     public Row queryOrderDataByOrderId(Long orderId){
