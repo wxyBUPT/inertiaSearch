@@ -1,6 +1,7 @@
 package com.alibaba.middleware.race.codec;
 
 import com.alibaba.middleware.race.RaceConf;
+import com.alibaba.middleware.race.models.comparableKeys.ComparableKeysByOrderId;
 
 /**
  * Created by xiyuanbupt on 7/26/16.
@@ -14,7 +15,9 @@ public class HashKeyHash {
 
     public static void main(String[] args){
         for(int i = 126;i<234;i++){
-            System.out.println(HashKeyHash.hashKeyHash(i));
         }
+
+        ComparableKeysByOrderId comparableKeysByOrderId = new ComparableKeysByOrderId(58455780174L,null);
+        System.out.println(hashKeyHash(comparableKeysByOrderId.hashCode()));
     }
 }

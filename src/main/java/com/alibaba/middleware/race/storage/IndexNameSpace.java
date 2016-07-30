@@ -69,6 +69,20 @@ public class IndexNameSpace {
             mBuyer.put(i,new IndexPartition<ComparableKeysByBuyerId>(i));
             mGood.put(i,new IndexPartition<ComparableKeysByGoodId>(i));
         }
+
+        //new Thread(new Runnable() {
+        //    @Override
+        //    public void run() {
+        //        while(true){
+        //            try {
+        //                Thread.sleep(3000);
+        //            }catch (Exception e){
+
+        //            }
+        //            LOG.info(mOrderPartion.get(381).getInfo());
+        //        }
+        //    }
+        //}).start();
     }
 
     public Row queryOrderDataByOrderId(Long orderId){

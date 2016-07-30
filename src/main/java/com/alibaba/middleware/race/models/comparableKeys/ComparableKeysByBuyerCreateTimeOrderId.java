@@ -50,7 +50,7 @@ public class ComparableKeysByBuyerCreateTimeOrderId implements Indexable,Compara
     @Override
     public String toString(){
         StringBuilder sb = new StringBuilder();
-        sb.append(ComparableKeysByBuyerCreateTimeOrderId.class.getName()+" : ");
+        sb.append("ComparableKeysByBuyerCreateTimeOrderId : ");
         sb.append("BuyerId: " + buyerId).append(", createTime: " + createTime + ",orderId: " + orderId);
         return sb.toString();
     }

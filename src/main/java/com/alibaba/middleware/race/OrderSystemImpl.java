@@ -40,6 +40,7 @@ public class OrderSystemImpl implements OrderSystem {
 
     private FileManager fileManager;
     private IndexNameSpace indexNameSpace;
+    CountDownLatch doneSignal;
 
     public OrderSystemImpl() {
         /**
@@ -102,7 +103,7 @@ public class OrderSystemImpl implements OrderSystem {
         /**
          * set countdownlatch,wait all file read finish
          */
-        final CountDownLatch doneSignal = new CountDownLatch(nThread);
+        doneSignal = new CountDownLatch(nThread);
 
         final AtomicInteger nOrderRemain = new AtomicInteger(3);
         final AtomicInteger nGoodRemain = new AtomicInteger(3);
@@ -171,7 +172,7 @@ public class OrderSystemImpl implements OrderSystem {
         //}).start();
 
         indexDoneSignal.await(59,TimeUnit.MINUTES);
-        doneSignal.await(59, TimeUnit.MINUTES);
+        //doneSignal.await(59, TimeUnit.MINUTES);
         LOG.info("Finish copy file. It means all origin file have moved to disk");
         LOG.info("FINISHINDEX , finish create all index. ");
         //fileManager.finishConstruct();
@@ -272,6 +273,12 @@ public class OrderSystemImpl implements OrderSystem {
 
     @Override
     public Result queryOrder(long orderId, Collection<String> keys) {
+        try {
+            doneSignal.await();
+        }catch (Exception e){
+
+        }
+
         queryOrderCount.incrementAndGet();
         Row orderData = indexNameSpace.queryOrderDataByOrderId(orderId);
         if(orderData == null){
@@ -296,6 +303,11 @@ public class OrderSystemImpl implements OrderSystem {
 
     @Override
     public Iterator<Result> queryOrdersByBuyer(long startTime, long endTime, String buyerid) {
+        try {
+            doneSignal.await();
+        }catch (Exception e){
+
+        }
         queryOrderByBuyerCount.incrementAndGet();
         final Deque<Row> orderDatas = indexNameSpace.queryOrderDataByBuyerCreateTime(startTime,endTime,buyerid);
 
@@ -323,6 +335,11 @@ public class OrderSystemImpl implements OrderSystem {
 
     @Override
     public Iterator<Result> queryOrdersBySaler(String salerid, String goodid, final Collection<String> keys) {
+        try {
+            doneSignal.await();
+        }catch (Exception e){
+
+        }
         queryOrderBySalerCount.incrementAndGet();
         final Row goodData = indexNameSpace.queryGoodDataByGoodId(goodid);
         final Queue<Row> orderDatas;
@@ -360,6 +377,11 @@ public class OrderSystemImpl implements OrderSystem {
 
     @Override
     public KeyValue sumOrdersByGood(String goodid, String key) {
+        try {
+            doneSignal.await();
+        }catch (Exception e){
+
+        }
         queryOrderByGoodCount.incrementAndGet();
         final Queue<Row> orderDatas = indexNameSpace.queryOrderDataByGoodid(goodid);
         List<ResultImpl> allData = new ArrayList<>(orderDatas.size());

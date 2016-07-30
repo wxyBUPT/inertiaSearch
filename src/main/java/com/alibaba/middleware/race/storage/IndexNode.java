@@ -70,4 +70,9 @@ abstract public class IndexNode<T extends Serializable & Comparable > implements
     public T getMinKey(){
         return data.firstElement();
     }
+
+    @Override
+    public String toString(){
+        return data.toString();
+    }
 }

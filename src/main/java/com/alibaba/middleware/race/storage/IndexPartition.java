@@ -10,7 +10,6 @@ import com.alibaba.middleware.race.models.Row;
 
 import java.io.Serializable;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -56,11 +55,8 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
      * 两个用于添加数据和排序的ArrayList
      * 每一个partion 会启动新的线程排序,并将排序后的索引添加到磁盘,并不会阻塞数据插入线程
      */
-    private LinkedBlockingQueue<List<T>> keysCacheQueue;
-    /**
-     * 档案用于缓存添加key 的arraylist
-     */
-    public List<T> currentCache;
+    private List<T> keysCache;
+
     /**
      * 当前缓存中有多少个元素
      */
@@ -69,7 +65,7 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
     /**
      * 执行quickSort
      */
-    private ShellSort<T> shellSort;
+    private QuickSort<T> quickSort;
 
     /**
      * 排序锁,只有一个线程能够执行排序任务
@@ -96,19 +92,18 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
          */
         myLRU = new ConcurrentLruCacheForBigData<>(RaceConf.N_ORDER_INDEX_CACHE_COUNT);
         flushUtil = new FlushUtil<>();
-        keysCacheQueue = new LinkedBlockingQueue<>(2);
-        try {
-            keysCacheQueue.put(new ArrayList<T>(RaceConf.PARTITION_CACHE_COUNT));
-            keysCacheQueue.put(new ArrayList<T>(RaceConf.PARTITION_CACHE_COUNT));
-            currentCache = keysCacheQueue.take();
-        }catch (Exception e){
-            e.printStackTrace();
-            System.exit(-1);
-        }
+        keysCache = new ArrayList<>(RaceConf.PARTITION_CACHE_COUNT);
         elementCount = 0;
-        shellSort = new ShellSort<>();
+        quickSort = new QuickSort<>();
         sortLock = new ReentrantLock();
         rootIndex = null;
+    }
+
+    public String getInfo(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("My hashCode is " + myHashCode);
+        sb.append("My root is " + rootIndex);
+        return sb.toString();
     }
 
     /**
@@ -124,41 +119,13 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
             /**
              * 对当前的元素执行快排
              */
-            /**
-             * 下面代码有线程安全问题,需要多加小心
-             */
-            tmp = currentCache;
-            try {
-                currentCache = keysCacheQueue.take();
-                elementCount = 0;
-            } catch (Exception e) {
-                e.printStackTrace();
-                System.exit(-1);
-            }
-
-            /**
-             * 下面的任务是将tmp 排序,并将其插入到磁盘中去,最好由另外的线程执行
-             * 下面代码出现了线程不安全问题,多线程会同时创建文件
-             */
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    List<T> sortedList = shellSort.shellsort(tmp);
-                    sortedKeysInDisk.add(flushUtil.moveListDataToDisk(sortedList));
-                    tmp.clear();
-                    boolean flag = keysCacheQueue.offer(tmp);
-                    if (!flag) {
-                        System.out.println("没能放入新的元素到缓存队列中");
-                        System.exit(-1);
-                    }
-                }
-            }).start();
-            /**
-             * 上面代码是启动线程,下面代码如果当前队列中两个缓存队列都不可用,会被阻塞
-             */
+            List<T> sortedList = quickSort.quicksort(keysCache);
+            sortedKeysInDisk.add(flushUtil.moveListDataToDisk(sortedList));
+            keysCache.clear();
+            elementCount=0;
         }
         elementCount++;
-        currentCache.add(t);
+        keysCache.add(t);
     }
 
     /**
@@ -173,20 +140,15 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
         if(rootIndex!=null){
             LOG.info("bTree already build by query!");
             return ;
+        }else {
+            LOG.info("构建线程创建索引");
         }
         /**
          * 清空当前缓存队列到硬盘中,因为有两个缓存队列,一个在另外的线程中执行,所以写下面的代码出现bug 的可能性比较大
          */
-        List<T> sortedList = shellSort.shellsort(currentCache);
-        sortedKeysInDisk.add(flushUtil.moveListDataToDisk(sortedList));
-        /**
-         * 等待排序线程被执行完
-         */
-        try {
-            keysCacheQueue.take();
-        }catch (Exception e){
-            e.printStackTrace();
-            System.exit(-1);
+        if(keysCache.size()!=0) {
+            List<T> sortedList = quickSort.quicksort(keysCache);
+            sortedKeysInDisk.add(flushUtil.moveListDataToDisk(sortedList));
         }
 
         while(sortedKeysInDisk.size()>1){
@@ -197,14 +159,14 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
             sortedKeysInDisk.add(flushUtil.mergeIterator(iterator,iterator1));
         }
         if(sortedKeysInDisk.size()<1){
-            System.out.println("完成归并排序出现了一些bug");
-            System.exit(-1);
+            LOG.info("hashCode 为" + myHashCode + "中没有元素");
+            rootIndex = null;
+            return;
         }
         DiskLoc diskLoc = flushUtil.buildBPlusTree(sortedKeysInDisk.poll());
         rootIndex = indexExtentManager.getIndexNodeFromDiskLocForInsert(diskLoc);
-}
-
-
+        LOG.info("创建索引完成,HashCode 是: " + myHashCode + "rootIndex 是 : " + rootIndex);
+    }
 
     /**
      * 查询一个元素
@@ -213,8 +175,9 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
      */
     public synchronized Row queryByKey(T t){
         if(rootIndex==null){
-            LOG.info("Start build bTree in query!!!");
+            LOG.info("Start build bTree in query!!! query is " + t);
             merageAndBuildMe();
+            LOG.info("查询阶段创建索引完成!! 查询的key 是" + t + "当前index root为" + rootIndex + ", hashCode 是" + myHashCode);
         }
         IndexNode<T> indexNode = rootIndex;
         while(!indexNode.isLeafNode()){
@@ -241,8 +204,9 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
      */
     public synchronized Deque<Row> rangeQuery(T startKey,T endKey) {
         if(rootIndex==null){
-            System.out.println("查询阶段创建bplus");
+            LOG.info("查询阶段创建bplus, query min key is  " + startKey + " query max key is " + endKey);
             merageAndBuildMe();
+            LOG.info("查询阶段创建bplus创建完成, query min key is " + startKey +"query max key is " + endKey + "当前indexroot 为" + rootIndex + ", hashCode 是:" + myHashCode);
         }
         /**
          * 对磁盘中进行层序遍历
