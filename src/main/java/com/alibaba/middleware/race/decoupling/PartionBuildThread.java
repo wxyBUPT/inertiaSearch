@@ -93,7 +93,10 @@ public abstract class PartionBuildThread <T extends Comparable<? super T> & Seri
             }
         }
         LOG.info("Create bPlus tree");
-        createBPlusTree();
+        /**
+         * 在惰性查找版本中,不会显示的创建b树
+         */
+        //createBPlusTree();
         LOG.info("Finsh create bPlust tree");
         sendFinishSingle.countDown();
         LOG.info("All index data have been insertd,Now enjoy Search !!!");

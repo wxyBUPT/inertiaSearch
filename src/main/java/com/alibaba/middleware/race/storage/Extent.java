@@ -76,18 +76,7 @@ public class Extent {
         }
     }
 
-    /**
-     * 从对应位置ofs 长度为 size 的位置中获得Row 格式的数据
-     * @param ofs 从这个extent 的 ofs 位置获取
-     * @param size 获取的数据长度为 size
-     * @return
-     */
-    public synchronized byte[] getBytesFromOfsAndSize(int ofs, int size){
-        byte[] bytes = new byte[size];
-        buffer.position(ofs);
-        buffer.get(bytes);
-        return bytes;
-    }
+
 
     /**
      * 如果之后还要想这个extent中插入数据则使用下面的方法,下面的方法目前没有作用

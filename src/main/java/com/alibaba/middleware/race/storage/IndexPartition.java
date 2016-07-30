@@ -219,6 +219,7 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
      * @return
      */
     public synchronized Row queryByKey(T t){
+        if(rootIndex==null)merageAndBuildMe();
         IndexNode<T> indexNode = rootIndex;
         while(!indexNode.isLeafNode()){
             DiskLoc diskLoc = indexNode.search(t);
@@ -243,6 +244,7 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
      * @return
      */
     public synchronized Deque<Row> rangeQuery(T startKey,T endKey) {
+        if(rootIndex==null)merageAndBuildMe();
         return levelTraversal(rootIndex,startKey,endKey);
     }
 

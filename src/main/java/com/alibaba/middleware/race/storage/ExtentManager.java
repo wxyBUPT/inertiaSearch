@@ -119,7 +119,7 @@ public abstract class ExtentManager {
         int _n = diskLoc.get_a();
         int ofs = diskLoc.getOfs();
         int size = diskLoc.getSize();
-        return extentMap.get(_n).getBytesFromOfsAndSize(ofs,size);
+        return extentMap.get(_n).getBytesFromOfsAndSizeForInsert(ofs,size);
     }
 
     public byte[] getBytesForInsert(DiskLoc diskLoc){

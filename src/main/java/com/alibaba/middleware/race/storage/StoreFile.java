@@ -130,8 +130,8 @@ public class StoreFile {
         }
         storeFile.finshConstruct();
         for(Extent extent:storeFile.myExtents){
-            System.out.println(new String(extent.getBytesFromOfsAndSize(0,9)));
-            System.out.println(new String(extent.getBytesFromOfsAndSize(9,9)));
+            System.out.println(new String(extent.getBytesFromOfsAndSizeForInsert(0,9)));
+            System.out.println(new String(extent.getBytesFromOfsAndSizeForInsert(9,9)));
         }
     }
 }

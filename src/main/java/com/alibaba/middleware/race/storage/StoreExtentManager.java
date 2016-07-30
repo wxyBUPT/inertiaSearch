@@ -40,7 +40,7 @@ public class StoreExtentManager extends ExtentManager{
         int _a = diskLoc.get_a();
         int ofs = diskLoc.getOfs();
         int size = diskLoc.getSize();
-        byte[] rowByte = extentMap.get(_a).getBytesFromOfsAndSize(ofs,size);
+        byte[] rowByte = extentMap.get(_a).getBytesFromOfsAndSizeForInsert(ofs,size);
         String line = new String(rowByte);
         return createKVMapFromLine(line);
     }
