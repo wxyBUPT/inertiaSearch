@@ -73,6 +73,25 @@ public class FlushUtil<T extends Comparable<? super T> & Serializable & Indexabl
         return newDiskLocks;
     }
 
+    public LinkedList<DiskLoc> loserTreeMerge(List<Iterator<T>> branches){
+        LoserTree<T> loserTree = new LoserTree<>(branches);
+        T top = loserTree.pop();
+        LinkedList<DiskLoc> newDiskLocks = new LinkedList<>();
+        IndexLeafNode<T> currentIndexLeaf = new IndexLeafNode<>();
+        while(top!=null){
+            if(currentIndexLeaf.isFull()){
+                DiskLoc diskLoc = indexExtentManager.putIndexLeafNode(currentIndexLeaf);
+                newDiskLocks.add(diskLoc);
+                currentIndexLeaf = new IndexLeafNode<>();
+            }
+            currentIndexLeaf.appendData(top);
+            top = loserTree.pop();
+        }
+        DiskLoc diskLoc = indexExtentManager.putIndexLeafNode(currentIndexLeaf);
+        newDiskLocks.add(diskLoc);
+        return newDiskLocks;
+    }
+
     /**
      * 对两个iteraot 归并排序,并存储到磁盘中,返回磁盘中的位置
      * @param firstIterator

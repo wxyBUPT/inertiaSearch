@@ -182,12 +182,19 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
             System.exit(-1);
         }
 
+        /**
+         * 使用败者树合并归并排序节点
+         */
         while(sortedKeysInDisk.size()>1){
-            LinkedList<DiskLoc> diskLocs = sortedKeysInDisk.poll();
-            LinkedList<DiskLoc> diskLocs1 = sortedKeysInDisk.poll();
-            IndexLeafNodeIterator<T> iterator = new IndexLeafNodeIterator<>(diskLocs,indexExtentManager);
-            IndexLeafNodeIterator<T> iterator1 = new IndexLeafNodeIterator<>(diskLocs1,indexExtentManager);
-            sortedKeysInDisk.add(flushUtil.mergeIterator(iterator,iterator1));
+            System.out.println(sortedKeysInDisk.size());
+            List<Iterator<T>> branchs = new ArrayList<>();
+            for(int i = 0;i<8;i++){
+                LinkedList<DiskLoc> diskLocs = sortedKeysInDisk.poll();
+                if(diskLocs!=null){
+                    branchs.add(new IndexLeafNodeIterator<T>(diskLocs,indexExtentManager));
+                }
+            }
+            sortedKeysInDisk.add(flushUtil.loserTreeMerge(branchs));
         }
         if(sortedKeysInDisk.size()<1){
             LOG.info("hashCode 为" + myHashCode + "中没有元素");
