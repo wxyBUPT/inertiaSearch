@@ -19,5 +19,14 @@ public class HashKeyHash {
 
         ComparableKeysByOrderId comparableKeysByOrderId = new ComparableKeysByOrderId(58455780174L,null);
         System.out.println(hashKeyHash(comparableKeysByOrderId.hashCode()));
+
+        comparableKeysByOrderId = new ComparableKeysByOrderId(53365522365L,null);
+        System.out.println(hashKeyHash(comparableKeysByOrderId.hashCode()));
+        comparableKeysByOrderId = new ComparableKeysByOrderId(587756401L,null);
+        System.out.println(hashKeyHash(comparableKeysByOrderId.hashCode()));
+        comparableKeysByOrderId = new ComparableKeysByOrderId(59490325730L,null);
+        System.out.println(hashKeyHash(comparableKeysByOrderId.hashCode()));
+        comparableKeysByOrderId = new ComparableKeysByOrderId(53365522365L,null);
+        System.out.println(hashKeyHash(comparableKeysByOrderId.hashCode()));
     }
 }

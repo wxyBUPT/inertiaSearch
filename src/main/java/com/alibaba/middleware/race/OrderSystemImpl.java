@@ -274,7 +274,7 @@ public class OrderSystemImpl implements OrderSystem {
     @Override
     public Result queryOrder(long orderId, Collection<String> keys) {
         try {
-            doneSignal.await();
+            indexDoneSignal.await();
         }catch (Exception e){
 
         }
@@ -304,7 +304,7 @@ public class OrderSystemImpl implements OrderSystem {
     @Override
     public Iterator<Result> queryOrdersByBuyer(long startTime, long endTime, String buyerid) {
         try {
-            doneSignal.await();
+            indexDoneSignal.await();
         }catch (Exception e){
 
         }
@@ -336,7 +336,7 @@ public class OrderSystemImpl implements OrderSystem {
     @Override
     public Iterator<Result> queryOrdersBySaler(String salerid, String goodid, final Collection<String> keys) {
         try {
-            doneSignal.await();
+            indexDoneSignal.await();
         }catch (Exception e){
 
         }
@@ -378,7 +378,7 @@ public class OrderSystemImpl implements OrderSystem {
     @Override
     public KeyValue sumOrdersByGood(String goodid, String key) {
         try {
-            doneSignal.await();
+            indexDoneSignal.await();
         }catch (Exception e){
 
         }

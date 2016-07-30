@@ -159,15 +159,6 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
      */
     public synchronized void merageAndBuildMe(){
         /**
-         * 避免重复创建
-         */
-        if(rootIndex!=null){
-            LOG.info("bTree already build by query!");
-            return ;
-        }else {
-            LOG.info("构建线程创建索引");
-        }
-        /**
          * 清空当前缓存队列到硬盘中,因为有两个缓存队列,一个在另外的线程中执行,所以写下面的代码出现bug 的可能性比较大
          */
         List<T> sortedList = quickSort.quicksort(currentCache);
@@ -204,7 +195,11 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
         LinkedList<DiskLoc> diskLocs = sortedKeysInDisk.poll();
         DiskLoc diskLoc = flushUtil.buildBPlusTree(diskLocs);
         rootIndex = indexExtentManager.getIndexNodeFromDiskLocForInsert(diskLoc);
-        LOG.info("创建索引完成,HashCode 是: " + myHashCode + "rootIndex 是 : " + rootIndex);
+        try {
+            LOG.info("创建索引完成,HashCode 是: " + myHashCode + "第一个元素是" + rootIndex.getDataAt(0));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -213,11 +208,6 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
      * @return
      */
     public synchronized Row queryByKey(T t){
-        if(rootIndex==null){
-            LOG.info("Start build bTree in query!!! query is " + t);
-            merageAndBuildMe();
-            LOG.info("查询阶段创建索引完成!! 查询的key 是" + t + "当前index root为" + rootIndex + ", hashCode 是" + myHashCode);
-        }
         IndexNode<T> indexNode = rootIndex;
         while(!indexNode.isLeafNode()){
             DiskLoc diskLoc = indexNode.search(t);
@@ -228,7 +218,7 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
             /**
              * 如果节点是非叶子节点,并且缓存中没有数据,则缓存
              */
-        if(cacheNode==null&&!indexNode.isLeafNode())myLRU.put(diskLoc,indexNode);
+            if(cacheNode==null&&!indexNode.isLeafNode())myLRU.put(diskLoc,indexNode);
         }
         DiskLoc diskLoc = indexNode.search(t);
         if(diskLoc==null)return null;
@@ -242,14 +232,6 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
      * @return
      */
     public synchronized Deque<Row> rangeQuery(T startKey,T endKey) {
-        if(rootIndex==null){
-            LOG.info("查询阶段创建bplus, query min key is  " + startKey + " query max key is " + endKey);
-            merageAndBuildMe();
-            LOG.info("查询阶段创建bplus创建完成, query min key is " + startKey +"query max key is " + endKey + "当前indexroot 为" + rootIndex + ", hashCode 是:" + myHashCode);
-        }
-        /**
-         * 对磁盘中进行层序遍历
-         */
         return levelTraversal(rootIndex,startKey,endKey);
     }
 
