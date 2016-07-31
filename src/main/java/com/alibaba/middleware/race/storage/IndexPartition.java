@@ -212,13 +212,9 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
         IndexNode<T> indexNode = rootIndex;
         while(!indexNode.isLeafNode()){
             DiskLoc diskLoc = indexNode.search(t);
-            IndexNode cacheNode = myLRU.get(diskLoc);
 
-            indexNode = cacheNode==null?indexExtentManager.getIndexNodeFromDiskLocForInsert(diskLoc):cacheNode;
+            indexNode = indexExtentManager.getIndexNodeFromDiskLocForInsert(diskLoc);
             if(diskLoc == null )return null;
-            if(cacheNode==null&&!indexNode.isLeafNode()){
-                myLRU.put(diskLoc,indexNode);
-            }
         }
         DiskLoc diskLoc = indexNode.search(t);
         if(diskLoc==null)return null;
@@ -264,11 +260,7 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
                 if(diskLocs!=null) {
                     while (!diskLocs.isEmpty()) {
                         DiskLoc diskLoc = diskLocs.remove();
-                        IndexNode cacheNode = myLRU.get(diskLoc);
-                        IndexNode indexNode = cacheNode==null?indexExtentManager.getIndexNodeFromDiskLocForInsert(diskLoc):cacheNode;
-                        if(cacheNode==null&&!indexNode.isLeafNode()){
-                            myLRU.put(diskLoc,indexNode);
-                        }
+                        IndexNode indexNode = indexExtentManager.getIndexNodeFromDiskLocForInsert(diskLoc);
                         nodes.add(indexNode);
                     }
                 }
