@@ -66,12 +66,7 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
     /**
      * 执行quickSort
      */
-    private QuickSort<T> quickSort;
-
-    /**
-     * 排序锁,只有一个线程能够执行排序任务
-     */
-    private Lock sortLock ;
+    private ShellSort<T> shellSort;
 
     /**
      * 构造函数
@@ -101,8 +96,7 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
             e.printStackTrace();System.exit(-1);
         }
         elementCount = 0;
-        quickSort = new QuickSort<>();
-        sortLock = new ReentrantLock();
+        shellSort = new ShellSort<>();
         rootIndex = null;
         totalCount = 0L;
     }
@@ -154,7 +148,7 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
         }
         @Override
         public void run() {
-            List<T> sortedList = quickSort.quicksort(cache);
+            List<T> sortedList = shellSort.shellsort(cache);
             sortedKeysInDisk.add(flushUtil.moveListDataToDisk(sortedList));
             keysCacheQueue.offer(new ArrayList<T>(RaceConf.PARTITION_CACHE_COUNT));
         }
@@ -169,7 +163,7 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
         /**
          * 清空当前缓存队列到硬盘中,因为有两个缓存队列,一个在另外的线程中执行,所以写下面的代码出现bug 的可能性比较大
          */
-        List<T> sortedList = quickSort.quicksort(currentCache);
+        List<T> sortedList = shellSort.shellsort(currentCache);
         sortedKeysInDisk.add(flushUtil.moveListDataToDisk(sortedList));
         /**
          * 等待排序线程执行完毕
@@ -188,9 +182,9 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
             System.out.println(sortedKeysInDisk.size());
             List<Iterator<T>> branchs = new ArrayList<>();
             /**
-             * 做100路的归并排序
+             * 对所有路进行归并排序,使用败者树
              */
-            for(int i = 0;i<100;i++){
+            while(sortedKeysInDisk.size()>0){
                 LinkedList<DiskLoc> diskLocs = sortedKeysInDisk.poll();
                 if(diskLocs!=null){
                     branchs.add(new IndexLeafNodeIterator<T>(diskLocs,indexExtentManager));
@@ -206,11 +200,6 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
         LinkedList<DiskLoc> diskLocs = sortedKeysInDisk.poll();
         DiskLoc diskLoc = flushUtil.buildBPlusTree(diskLocs);
         rootIndex = indexExtentManager.getIndexNodeFromDiskLocForInsert(diskLoc);
-        try {
-            LOG.info("创建索引完成,HashCode 是: " + myHashCode + "第一个元素是" + rootIndex.getDataAt(0));
-        }catch (Exception e){
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -224,31 +213,7 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
         while(!indexNode.isLeafNode()){
             DiskLoc diskLoc = indexNode.search(t);
             if(diskLoc == null )return null;
-
-            IndexNode cacheNode = myLRU.get(diskLoc);
-            indexNode = cacheNode==null?indexExtentManager.getIndexNodeFromDiskLocForInsert(diskLoc):cacheNode;
-            /**
-             * 如果节点是非叶子节点,并且缓存中没有数据,则缓存
-             */
-            if(cacheNode==null&&!indexNode.isLeafNode())myLRU.put(diskLoc,indexNode);
-        }
-        DiskLoc diskLoc = indexNode.search(t);
-        if(diskLoc==null)return null;
-        return originalExtentManager.getRowFromDiskLoc(diskLoc);
-    }
-
-    protected Row queryByKeyForMinData(T t){
-        IndexNode<T> indexNode = rootIndex;
-        while(!indexNode.isLeafNode()){
-            DiskLoc diskLoc = indexNode.search(t);
-            if(diskLoc==null)return null;
-
-            IndexNode cacheNode = myLRU.get(diskLoc);
-            indexNode = cacheNode==null?indexExtentManager.getIndexNodeFromDiskLocForInsert(diskLoc):cacheNode;
-            /**
-             * 如果缓存中没有数据,则缓存
-             */
-            if(cacheNode==null)myLRU.put(diskLoc,indexNode);
+            indexNode = indexExtentManager.getIndexNodeFromDiskLocForInsert(diskLoc);
         }
         DiskLoc diskLoc = indexNode.search(t);
         if(diskLoc==null)return null;
@@ -294,11 +259,7 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
                 if(diskLocs!=null) {
                     while (!diskLocs.isEmpty()) {
                         DiskLoc diskLoc = diskLocs.remove();
-                        IndexNode cacheNode = myLRU.get(diskLoc);
-                        IndexNode indexNode = cacheNode==null?indexExtentManager.getIndexNodeFromDiskLocForInsert(diskLoc):cacheNode;
-                        if(cacheNode==null&& !indexNode.isLeafNode()){
-                            myLRU.put(diskLoc,indexNode);
-                        }
+                        IndexNode indexNode = indexExtentManager.getIndexNodeFromDiskLocForInsert(diskLoc);
                         nodes.add(indexNode);
                     }
                 }

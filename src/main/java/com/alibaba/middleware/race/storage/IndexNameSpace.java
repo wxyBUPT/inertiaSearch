@@ -47,8 +47,8 @@ public class IndexNameSpace {
     /**
      * 加入buyer 和 good
      */
-    public static HashMap<Integer,BuyerIndexPartion<ComparableKeysByBuyerId>> mBuyer;
-    public static HashMap<Integer,GoodIndexPartion<ComparableKeysByGoodId>> mGood;
+    public static HashMap<Integer,IndexPartition<ComparableKeysByBuyerId>> mBuyer;
+    public static HashMap<Integer,IndexPartition<ComparableKeysByGoodId>> mGood;
 
     private IndexNameSpace(){
         /**
@@ -63,8 +63,8 @@ public class IndexNameSpace {
             mOrderPartion.put(i,new IndexPartition<ComparableKeysByOrderId>(i));
             mBuyerCreateTimeOrderPartion.put(i,new IndexPartition<ComparableKeysByBuyerCreateTimeOrderId>(i));
             mGoodOrderPartions.put(i,new IndexPartition<ComparableKeysByGoodOrderId>(i));
-            mBuyer.put(i,new BuyerIndexPartion<ComparableKeysByBuyerId>(i));
-            mGood.put(i,new GoodIndexPartion<ComparableKeysByGoodId>(i));
+            mBuyer.put(i,new IndexPartition<ComparableKeysByBuyerId>(i));
+            mGood.put(i,new IndexPartition<ComparableKeysByGoodId>(i));
         }
 
         new Thread(new Runnable() {
@@ -80,8 +80,8 @@ public class IndexNameSpace {
                     sb.append("orderPartionElementCount is : " ).append(calculatePartionTotalCount(mOrderPartion));
                     sb.append(", buyerPartionElementCount is : ").append(calculatePartionTotalCount(mBuyerCreateTimeOrderPartion));
                     sb.append(", goodPartionElementCount is : ").append(calculatePartionTotalCount(mGoodOrderPartions));
-                    sb.append(", buyerCreateTimeOrderPartionCount is : ").append(calculateBuyerPartionTotalCount(mBuyer));
-                    sb.append(", goodOrderPartionCount is : ").append(calculateGoodPartionTotalCount(mGood));
+                    sb.append(", buyerCreateTimeOrderPartionCount is : ").append(calculatePartionTotalCount(mBuyer));
+                    sb.append(", goodOrderPartionCount is : ").append(calculatePartionTotalCount(mGood));
                     LOG.info(sb.toString());
                 }
             }
@@ -96,21 +96,6 @@ public class IndexNameSpace {
         return count;
     }
 
-    private  <T extends Comparable<? super T>&Indexable&Serializable> Long calculateGoodPartionTotalCount(HashMap<Integer,GoodIndexPartion<T>> hashMap){
-        Long count = 0L;
-        for(Map.Entry<Integer,GoodIndexPartion<T>> entry:hashMap.entrySet()){
-            count += entry.getValue().getTotalCount();
-        }
-        return count;
-    }
-
-    private  <T extends Comparable<? super T>&Indexable&Serializable> Long calculateBuyerPartionTotalCount(HashMap<Integer,BuyerIndexPartion<T>> hashMap){
-        Long count = 0L;
-        for(Map.Entry<Integer,BuyerIndexPartion<T>> entry:hashMap.entrySet()){
-            count += entry.getValue().getTotalCount();
-        }
-        return count;
-    }
 
     public Row queryOrderDataByOrderId(Long orderId){
 

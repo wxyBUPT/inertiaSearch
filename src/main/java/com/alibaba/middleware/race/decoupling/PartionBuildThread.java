@@ -94,9 +94,9 @@ public abstract class PartionBuildThread <T extends Comparable<? super T> & Seri
         }
         LOG.info("Create bPlus tree");
         /**
-         * 在惰性查找版本中,不会显示的创建b树
+         * 开始创建b 树,直到construct 阶段结束
          */
-        //createBPlusTree();
+        createBPlusTree();
         LOG.info("Finsh create bPlust tree");
         sendFinishSingle.countDown();
     }

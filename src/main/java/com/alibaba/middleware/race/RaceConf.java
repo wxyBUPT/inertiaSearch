@@ -95,7 +95,7 @@ public class RaceConf {
      * order 数据量较多,只存储非叶子节点
      * 因为有三个对应索引,所以数量是750 的三倍
      */
-    public static final Integer N_ORDER_INDEX_CACHE_COUNT = 2500;
+    public static final Integer N_ORDER_INDEX_CACHE_COUNT = 10;
 
     /**
      * 根据 hash 分片个个数
@@ -136,7 +136,7 @@ public class RaceConf {
             }
         }
         byte[] bytes = SerializationUtils.serialize(inIndexLeafNode);
-        System.out.println("一个 " + RaceConf.INDEXNODEMAXSIZE + "的最长节点长度是" + bytes.length/1024 + "KByte");
+        System.out.println("一个 " + RaceConf.INDEXNODEMAXSIZE + "的最长节点长度是" + bytes.length/1024 + "KB");
         bytes = SerializationUtils.serialize(orderIds);
         System.out.println("一个 " + RaceConf.INDEXNODEMAXSIZE + "的orderID长度是" + bytes.length/1024 + "KB");
         bytes = SerializationUtils.serialize(goodOrderIds);
