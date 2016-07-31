@@ -10,7 +10,7 @@ public enum StoreType implements Serializable{
         //序列化只有的Row 格式数据
         ROWDATA,
         //
-        INDEXLEAFNODE,INDEXTREENODE,INDEXHEADER,INDEXNODE,BUYERLINE,GOODLINE,ORDERLINE,
+        INDEXLEAFNODE,INDEXHEADER,INDEXNODE,BUYERLINE,GOODLINE,ORDERLINE,
         //只是向里面插入,未定义的数据
         NOTDEFINED;
 }

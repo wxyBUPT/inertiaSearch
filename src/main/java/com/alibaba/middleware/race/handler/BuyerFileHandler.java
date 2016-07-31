@@ -12,12 +12,15 @@ import java.io.IOException;
  * Created by xiyuanbupt on 7/28/16.
  */
 public class BuyerFileHandler extends DataFileHandler{
+    /**
+     * 下面两个声明是为了减少处理行数据的时候多次声明
+     */
     @Override
     void handleLine(String line, DiskLoc diskLoc) throws IOException, OrderSystem.TypeException, InterruptedException {
-        diskLoc.setStoreType(StoreType.BUYERLINE);
 
+        String buyerid;
         String[] kvs = line.split("\t");
-        String buyerid = null;
+        buyerid = null;
         for(String kv:kvs){
             int p = kv.indexOf(":");
             String key = kv.substring(0,p);
@@ -30,6 +33,24 @@ public class BuyerFileHandler extends DataFileHandler{
                 break;
             }
         }
+
+        /**
+         * Put index info to queue
+         */
+        ComparableKeysByBuyerId key = new ComparableKeysByBuyerId(buyerid,diskLoc);
+        DiskLocQueues.comparableKeysByBuyerIdQueue.put(key);
+    }
+
+    void myHandleLine(String line,DiskLoc diskLoc)throws IOException,OrderSystem.TypeException,InterruptedException{
+
+        String buyerid ;
+        int i;
+        i = line.indexOf("buyerid:");
+        line = line.substring(i+8);
+        i = line.indexOf("\t");
+        if(i!=-1){
+            buyerid = line.substring(0,i);
+        }else buyerid = line;
 
         /**
          * Put index info to queue

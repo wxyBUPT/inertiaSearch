@@ -104,7 +104,7 @@ public class Extent {
             return null;
         }
         buffer.put(bytes);
-        DiskLoc diskLoc = new DiskLoc(extentNo,currentOfs,StoreType.NOTDEFINED,size);
+        DiskLoc diskLoc = new DiskLoc(extentNo,currentOfs,size);
         //update currentOfs
         currentOfs = buffer.position();
         return diskLoc;

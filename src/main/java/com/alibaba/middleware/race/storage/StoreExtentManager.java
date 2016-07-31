@@ -5,7 +5,8 @@ import com.alibaba.middleware.race.models.RowKV;
 
 /**
  * Created by xiyuanbupt on 7/23/16.
- *
+ * 本类的本意是讲原始的数据复制一份,直接存储为最终答案row 格式,但是事实证明不能在规定的时间构建完成
+ * 故本类没有实际使用到
  */
 public class StoreExtentManager extends ExtentManager{
 

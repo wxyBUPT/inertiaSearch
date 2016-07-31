@@ -13,14 +13,16 @@ import java.io.IOException;
  */
 public class GoodFileHandler extends DataFileHandler{
 
+    /**
+     * 下面声明是为了减少处理行数据的时候的声明
+     */
     @Override
     void handleLine(String line, DiskLoc diskLoc) throws IOException, OrderSystem.TypeException, InterruptedException {
-        diskLoc.setStoreType(StoreType.GOODLINE);
         /**
          * Find goodid and salerid
          */
-        String[] kvs = line.split("\t");
         String goodid = null;
+        String[] kvs = line.split("\t");
         for(String kv: kvs){
             int p = kv.indexOf(":");
             String key = kv.substring(0,p);
@@ -37,6 +39,23 @@ public class GoodFileHandler extends DataFileHandler{
         if(goodid==null ){
             throw new RuntimeException("Bad data! goodid " + goodid  );
         }
+        ComparableKeysByGoodId goodIdKeys = new ComparableKeysByGoodId(goodid,diskLoc);
+        DiskLocQueues.comparableKeysByGoodIdQueue.put(goodIdKeys);
+    }
+
+    void myHandleLine(String line,DiskLoc diskLoc) throws IOException,OrderSystem.TypeException,InterruptedException{
+        String goodid;
+        int p;
+        p = line.indexOf("goodid:");
+        line = line.substring(p+7);
+        p = line.indexOf("\t");
+        if(p!=-1){
+            goodid = line.substring(0,p);
+        }else goodid = line;
+
+        /**
+         * Put index info to queue
+         */
         ComparableKeysByGoodId goodIdKeys = new ComparableKeysByGoodId(goodid,diskLoc);
         DiskLocQueues.comparableKeysByGoodIdQueue.put(goodIdKeys);
     }

@@ -94,7 +94,7 @@ public abstract class DataFileHandler{
                 int lineByteSize = line.getBytes("UTF-8").length;
                 DiskLoc diskLoc = new DiskLoc(currentExtentNum,
                         currentLinePosition.intValue()-currentExtentPosition.intValue(),
-                        StoreType.NOTDEFINED,lineByteSize);
+                        lineByteSize);
                 /**
                  * 当前位置越过一个 /r
                  */

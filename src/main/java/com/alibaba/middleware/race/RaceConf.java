@@ -119,16 +119,16 @@ public class RaceConf {
             if(!inIndexLeafNode.isFull()) {
                 inIndexLeafNode.appendData(
                         new ComparableKeysByBuyerCreateTimeOrderId("ap-83a7-9c56d34045aa",
-                                1L, 2L, new DiskLoc(0, 0, StoreType.GOODLINE, 0))
+                                1L, 2L, new DiskLoc(0, 0,  0))
                 );
                 orderIds.appendData(new ComparableKeysByOrderId(
-                        1L,new DiskLoc(0,0,StoreType.BUYERLINE,0)
+                        1L,new DiskLoc(0,0,0)
                 ));
                 goodOrderIds.appendData(new ComparableKeysByGoodOrderId(
-                        "dd-b00a-d67c9f59ce06",2L,new DiskLoc(0, 0, StoreType.GOODLINE, 0)
+                        "dd-b00a-d67c9f59ce06",2L,new DiskLoc(0, 0,  0)
                 ));
                 byBuyerIds.appendData(new ComparableKeysByBuyerId(
-                     "ap-83a7-9c56d34045aa",new DiskLoc(0,0,StoreType.GOODLINE,0)
+                     "ap-83a7-9c56d34045aa",new DiskLoc(0,0,0)
                 ));
             }
             else {
@@ -144,17 +144,17 @@ public class RaceConf {
         bytes = SerializationUtils.serialize(byBuyerIds);
         System.out.println("一个 " + RaceConf.INDEXNODEMAXSIZE + "的buyerId长度是" + bytes.length/1024 + "KB");
         System.out.println(new ComparableKeysByBuyerCreateTimeOrderId("ap-83a7-9c56d34045aa",
-                1L, 2L, new DiskLoc(0, 0, StoreType.GOODLINE, 0)).hashCode());
+                1L, 2L, new DiskLoc(0, 0,  0)).hashCode());
         System.out.println(new ComparableKeysByBuyerId(
-                "ap-83a7-9c56d34045aa",new DiskLoc(0,0,StoreType.GOODLINE,0)).hashCode());
+                "ap-83a7-9c56d34045aa",new DiskLoc(0,0,0)).hashCode());
         System.out.println(new ComparableKeysByBuyerCreateTimeOrderId("ap-83a7-9c56d34045ab",
-                1L, 2L, new DiskLoc(0, 0, StoreType.GOODLINE, 0)).hashCode());
+                1L, 2L, new DiskLoc(0, 0,  0)).hashCode());
         System.out.println(new ComparableKeysByBuyerCreateTimeOrderId("ap-83a7-9c56d34045ab",
-                1L, 2L, new DiskLoc(0, 0, StoreType.GOODLINE, 0)).hashCode());
+                1L, 2L, new DiskLoc(0, 0,  0)).hashCode());
         System.out.println(new ComparableKeysByBuyerCreateTimeOrderId("ap-83a7-9c56d34045ab",
-                1L, 2L, new DiskLoc(0, 0, StoreType.GOODLINE, 0)).hashCode());
+                1L, 2L, new DiskLoc(0, 0,  0)).hashCode());
         System.out.println(new ComparableKeysByBuyerCreateTimeOrderId("ap-83a1-9c56d34045ab",
-                1L, 2L, new DiskLoc(0, 0, StoreType.GOODLINE, 0)).hashCode());
+                1L, 2L, new DiskLoc(0, 0,  0)).hashCode());
 
     }
 }

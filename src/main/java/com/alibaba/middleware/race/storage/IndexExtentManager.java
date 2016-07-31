@@ -74,7 +74,6 @@ public class IndexExtentManager extends ExtentManager{
     public DiskLoc putIndexLeafNode(IndexLeafNode indexLeafNode) {
         byte[] bytes = SerializationUtils.serialize(indexLeafNode);
         DiskLoc diskLoc = putBytes(bytes);
-        diskLoc.storeType = StoreType.INDEXLEAFNODE;
         return diskLoc;
     }
 
@@ -86,7 +85,6 @@ public class IndexExtentManager extends ExtentManager{
     public DiskLoc putIndexNode(IndexNode indexNode){
         byte[] bytes = SerializationUtils.serialize(indexNode);
         DiskLoc diskLoc = putBytes(bytes);
-        diskLoc.storeType = StoreType.INDEXNODE;
         return diskLoc;
     }
 
@@ -98,7 +96,7 @@ public class IndexExtentManager extends ExtentManager{
         IndexExtentManager indexExtentManager = IndexExtentManager.getInstance();
         LOG.info("finsh");
         IndexLeafNode<ComparableKeysByOrderId> indexLeafNode = new IndexLeafNode<>();
-        indexLeafNode.appendData(new ComparableKeysByOrderId(123L,new DiskLoc(0,0,StoreType.INDEXHEADER,1)));
+        indexLeafNode.appendData(new ComparableKeysByOrderId(123L,new DiskLoc(0,0,1)));
         DiskLoc diskLoc = indexExtentManager.putIndexLeafNode(indexLeafNode);
         IndexLeafNode<ComparableKeysByOrderId> indexLeafNode1 = indexExtentManager.getIndexLeafNodeFromDiskLoc(diskLoc);
         System.out.println(indexLeafNode1);
