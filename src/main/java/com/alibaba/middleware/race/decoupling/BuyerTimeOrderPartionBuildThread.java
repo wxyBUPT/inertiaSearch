@@ -4,6 +4,7 @@ import com.alibaba.middleware.race.codec.HashKeyHash;
 import com.alibaba.middleware.race.models.comparableKeys.ComparableKeysByBuyerCreateTimeOrderId;
 import com.alibaba.middleware.race.storage.IndexPartition;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;

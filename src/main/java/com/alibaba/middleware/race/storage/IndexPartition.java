@@ -26,12 +26,12 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
     /**
      * 一类Key 值被分为64部分
      */
-    private final int myHashCode;
+    protected final int myHashCode;
 
     /**
      * Vector 中每一个元素都是在磁盘中排好序的key 值,此部分
      */
-    private Queue<LinkedList<DiskLoc>> sortedKeysInDisk;
+    protected Queue<LinkedList<DiskLoc>> sortedKeysInDisk;
 
     /**
      * 用来缓存b+ 树的跟节点
@@ -41,13 +41,13 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
     /**
      * 查询阶段的缓存放在partition 中
      */
-    private final LRUCache<DiskLoc,IndexNode> myLRU;
+    protected LRUCache<DiskLoc,IndexNode> myLRU;
 
     /**
      * 两个用于和底层db 交互的代理
      */
-    private IndexExtentManager indexExtentManager;
-    private OriginalExtentManager originalExtentManager;
+    protected IndexExtentManager indexExtentManager;
+    protected OriginalExtentManager originalExtentManager;
 
     private FlushUtil<T> flushUtil;
 
@@ -231,6 +231,24 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
              * 如果节点是非叶子节点,并且缓存中没有数据,则缓存
              */
             if(cacheNode==null&&!indexNode.isLeafNode())myLRU.put(diskLoc,indexNode);
+        }
+        DiskLoc diskLoc = indexNode.search(t);
+        if(diskLoc==null)return null;
+        return originalExtentManager.getRowFromDiskLoc(diskLoc);
+    }
+
+    protected Row queryByKeyForMinData(T t){
+        IndexNode<T> indexNode = rootIndex;
+        while(!indexNode.isLeafNode()){
+            DiskLoc diskLoc = indexNode.search(t);
+            if(diskLoc==null)return null;
+
+            IndexNode cacheNode = myLRU.get(diskLoc);
+            indexNode = cacheNode==null?indexExtentManager.getIndexNodeFromDiskLocForInsert(diskLoc):cacheNode;
+            /**
+             * 如果缓存中没有数据,则缓存
+             */
+            if(cacheNode==null)myLRU.put(diskLoc,indexNode);
         }
         DiskLoc diskLoc = indexNode.search(t);
         if(diskLoc==null)return null;

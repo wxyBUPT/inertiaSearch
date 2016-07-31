@@ -99,7 +99,6 @@ public abstract class PartionBuildThread <T extends Comparable<? super T> & Seri
         //createBPlusTree();
         LOG.info("Finsh create bPlust tree");
         sendFinishSingle.countDown();
-        LOG.info("All index data have been insertd,Now enjoy Search !!!");
     }
 
     private void insertKeys(T key){

@@ -7,6 +7,7 @@ import com.alibaba.middleware.race.models.comparableKeys.ComparableKeysByGoodOrd
 import com.alibaba.middleware.race.models.comparableKeys.ComparableKeysByOrderId;
 import com.alibaba.middleware.race.storage.DiskLoc;
 import com.alibaba.middleware.race.storage.IndexLeafNode;
+import com.alibaba.middleware.race.storage.IndexPartition;
 import com.alibaba.middleware.race.storage.StoreType;
 
 /**
@@ -79,13 +80,16 @@ public class RaceConf {
      * leafNode 的数量为 600000 个
      *
      */
-    //因为good key 值比较小,故叶子节点和非叶子节点全部存储
-    public static final Integer N_GOOD_INDEX_CACHE_COUNT = 6300;
 
     /**
-     * buyer index 缓存的数量,因为buyer 的数量要多一点,故不全部存储于内存
+     * 下面两个都是每一个partion 缓存indexnode 的数量.
+     * 如果两个参数都是20 的话,可能所有index 节点都会被缓存
      */
-    public static final Integer N_BUYER_INDEX_CACHE_COUNT = 9000;
+    public static final Integer N_GOOD_INDEX_CACHE_COUNT = 20;
+    /**
+     * buyer good index 缓存的数量,因为buyer 的数量要多一点,故不全部存储于内存
+     */
+    public static final Integer N_BUYER_INDEX_CACHE_COUNT = 20;
     /**
      * order index 缓存的数量
      * order 数据量较多,只存储非叶子节点
