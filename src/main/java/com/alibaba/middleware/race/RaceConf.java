@@ -32,7 +32,7 @@ public class RaceConf {
      */
 
     //一个index 保存最大的索引量
-    public static final int INDEXNODEMAXSIZE = 800;
+    public static final int INDEXNODEMAXSIZE = 600;
     /**
      * 内存中索引存储最多key 的数量
      */
@@ -100,12 +100,12 @@ public class RaceConf {
     /**
      * 根据 hash 分片个个数
      */
-    public static final Integer N_PARTITION = 768;
+    public static final Integer N_PARTITION = 1024;
 
     /**
      * 一个partion中有两个保存keys的arrayList用作cache,
      */
-    public static final Integer PARTITION_CACHE_COUNT = 6400;
+    public static final Integer PARTITION_CACHE_COUNT = 4800;
 
     public static void main(String[] args){
         int TESTCOUNT = 1200;
