@@ -15,8 +15,7 @@ public class BuyerFileHandler extends DataFileHandler{
     /**
      * 下面两个声明是为了减少处理行数据的时候多次声明
      */
-    @Override
-    void handleLine(String line, DiskLoc diskLoc) throws IOException, OrderSystem.TypeException, InterruptedException {
+    void xhandleLine(String line, DiskLoc diskLoc) throws IOException, OrderSystem.TypeException, InterruptedException {
 
         String buyerid;
         String[] kvs = line.split("\t");
@@ -41,7 +40,8 @@ public class BuyerFileHandler extends DataFileHandler{
         DiskLocQueues.comparableKeysByBuyerIdQueue.put(key);
     }
 
-    void myHandleLine(String line,DiskLoc diskLoc)throws IOException,OrderSystem.TypeException,InterruptedException{
+    @Override
+    void handleLine(String line,DiskLoc diskLoc)throws IOException,OrderSystem.TypeException,InterruptedException{
 
         String buyerid ;
         int i;

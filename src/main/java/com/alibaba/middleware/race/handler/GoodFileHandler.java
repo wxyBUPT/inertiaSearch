@@ -16,8 +16,7 @@ public class GoodFileHandler extends DataFileHandler{
     /**
      * 下面声明是为了减少处理行数据的时候的声明
      */
-    @Override
-    void handleLine(String line, DiskLoc diskLoc) throws IOException, OrderSystem.TypeException, InterruptedException {
+    void xhandleLine(String line, DiskLoc diskLoc) throws IOException, OrderSystem.TypeException, InterruptedException {
         /**
          * Find goodid and salerid
          */
@@ -43,7 +42,8 @@ public class GoodFileHandler extends DataFileHandler{
         DiskLocQueues.comparableKeysByGoodIdQueue.put(goodIdKeys);
     }
 
-    void myHandleLine(String line,DiskLoc diskLoc) throws IOException,OrderSystem.TypeException,InterruptedException{
+    @Override
+    void handleLine(String line,DiskLoc diskLoc) throws IOException,OrderSystem.TypeException,InterruptedException{
         String goodid;
         int p;
         p = line.indexOf("goodid:");
