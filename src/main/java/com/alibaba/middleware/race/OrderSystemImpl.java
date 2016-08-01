@@ -117,7 +117,7 @@ public class OrderSystemImpl implements OrderSystem {
              */
             final Vector<Collection<String>> buyerFilesDivideBy2 = fileDivideByN(buyerFilesforInsert,2);
             final Vector<Collection<String>> goodFilesDivideBy2 = fileDivideByN(goodFilesforInsert,2);
-            final Vector<Collection<String>> orderFilesDivideBy2 = fileDivideByN(orderFilesforInsert,2);
+            final Vector<Collection<String>> orderFilesDivideBy3 = fileDivideByN(orderFilesforInsert,3);
             /**
              * 开始处理本文件夹中的buyer 文件
              */
@@ -157,7 +157,7 @@ public class OrderSystemImpl implements OrderSystem {
                 }).start();
             }
 
-            for(final Collection<String> files: orderFilesDivideBy2){
+            for(final Collection<String> files: orderFilesDivideBy3){
                 nThread ++;
                 LOG.info("Handle files: " + files);
                 nOrderRemain.incrementAndGet();
