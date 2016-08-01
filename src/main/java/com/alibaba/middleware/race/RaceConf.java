@@ -53,7 +53,13 @@ public class RaceConf {
      * 在内存中缓存key值最大的容量
      * 对于orderfile ,如果一个线程是满的,另外两个线程都会被阻塞
      */
-    public static final int INMEMORYMAXQUEUESIZE = 800000;
+    public static final int INMEMORYMAXQUEUESIZE = 80000;
+
+    /**
+     * 内存中可以存储的原始order line 的数量,即控制队列的大小,队列的作用是生产消费队列,
+     * 一个生产者,多个消费者
+     */
+    public static final int INMEMORY_MAX_ORIGINAL_ORDERLINE = 80000;
 
     /**
      * 一个Extent 的大小,以及一个文件中Extent 中的数目
@@ -107,7 +113,16 @@ public class RaceConf {
      */
     public static final Integer PARTITION_CACHE_COUNT = 1200;
 
-    public static final Integer PARTITION_BTREE_BUILD_CONCURRENT = 6;
+    public static final Integer PARTITION_BTREE_BUILD_CONCURRENT = 48;
+    /**
+     * 在查询阶段,专门用来创建b 树的线程需要"死"多少
+     */
+    public static final Integer PARTION_BUILD_DIE_COUNT = 16;
+
+    /**
+     * 解码orderline 的线程数量
+     */
+    public static final Integer N_ORDER_LINE_DECOD_THREAD = 3;
 
     public static void main(String[] args){
         int TESTCOUNT = 1200;

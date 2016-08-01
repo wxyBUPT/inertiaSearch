@@ -2,6 +2,7 @@ package com.alibaba.middleware.race.handler;
 
 import com.alibaba.middleware.race.OrderSystem;
 import com.alibaba.middleware.race.decoupling.DiskLocQueues;
+import com.alibaba.middleware.race.decoupling.OrderLineWithDiskLoc;
 import com.alibaba.middleware.race.models.comparableKeys.ComparableKeysByBuyerCreateTimeOrderId;
 import com.alibaba.middleware.race.models.comparableKeys.ComparableKeysByGoodOrderId;
 import com.alibaba.middleware.race.models.comparableKeys.ComparableKeysByOrderId;
@@ -11,6 +12,7 @@ import java.io.IOException;
 
 /**
  * Created by xiyuanbupt on 7/28/16.
+ * 8月1日重构,因为cpu 速度赶不上文件读速度,所以使用多线程处理order 数据,中间通过队列解耦
  */
 public class OrderFileHandler extends DataFileHandler{
 
@@ -79,55 +81,9 @@ public class OrderFileHandler extends DataFileHandler{
     @Override
     void handleLine(String line,DiskLoc diskLoc) throws IOException,OrderSystem.TypeException,InterruptedException{
 
-        /**
-         * 处理行数据
-         */
-        Long orderid ;
-        String buyerid ;
-        Long createtime ;
-        String goodid  ;
-        String tmp;
-        int p;
-        p = line.indexOf("orderid:");
-        tmp = line.substring(p+8);
-        p = tmp.indexOf("\t");
-        if(p!=-1){
-            orderid = Long.parseLong(tmp.substring(0,p));
-        }else orderid = Long.parseLong(tmp);
+        OrderLineWithDiskLoc orderLineWithDiskLoc = new OrderLineWithDiskLoc(line,diskLoc);
+        DiskLocQueues.originalOrderLineWithDisklocQueues.put(orderLineWithDiskLoc);
 
-        p = line.indexOf("buyerid:");
-        tmp = line.substring(p+8);
-        p = tmp.indexOf("\t");
-        if(p!=-1){
-            buyerid = tmp.substring(0,p);
-        }else buyerid = tmp;
-
-        p = line.indexOf("createtime:");
-        tmp = line.substring(p+11);
-        p = tmp.indexOf("\t");
-        if(p!=-1){
-            createtime = Long.parseLong(tmp.substring(0,p));
-        }else createtime = Long.parseLong(tmp);
-
-        p = line.indexOf("goodid:");
-        tmp = line.substring(p+7);
-        p = tmp.indexOf("\t");
-        if(p!=-1){
-            goodid = tmp.substring(0,p);
-        }else goodid = tmp;
-
-        ComparableKeysByOrderId orderIdKeys = new ComparableKeysByOrderId(orderid,diskLoc);
-        DiskLocQueues.comparableKeysByOrderId.put(orderIdKeys);
-
-        ComparableKeysByBuyerCreateTimeOrderId buyerCreateTimeOrderId = new ComparableKeysByBuyerCreateTimeOrderId(
-                buyerid, createtime, orderid,diskLoc
-        );
-        DiskLocQueues.comparableKeysByBuyerCreateTimeOrderId.put(buyerCreateTimeOrderId);
-
-        ComparableKeysByGoodOrderId goodOrderKeys = new ComparableKeysByGoodOrderId(
-                goodid,orderid,diskLoc
-        );
-        DiskLocQueues.comparableKeysByGoodOrderId.put(goodOrderKeys);
     }
 
     private void indexOfStrategy(String line){

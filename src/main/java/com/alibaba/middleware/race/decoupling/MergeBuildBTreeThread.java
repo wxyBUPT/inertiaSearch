@@ -23,7 +23,14 @@ public class MergeBuildBTreeThread<T extends Comparable<? super T>&Indexable&Ser
              * 如果处于查询阶段,则可以停止当前线程,构建线程可以交给查询线程
              */
             if(GlobalSingle.ISQUERYTIME){
-                break;
+                /**
+                 * 如果还有需要死的线程,则停止当前线程
+                 * 哪个线程停止有随机效应
+                 */
+                if(GlobalSingle.buildThreadShouldDieCount.decrementAndGet()>=0){
+
+                    break;
+                }
             }
             partition.merageAndBuildMe();
         }

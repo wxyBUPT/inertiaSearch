@@ -4,6 +4,7 @@ import com.alibaba.middleware.race.RaceConf;
 import com.alibaba.middleware.race.models.comparableKeys.*;
 
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Created by xiyuanbupt on 7/18/16.
@@ -18,6 +19,8 @@ public class DiskLocQueues {
     public static final LinkedBlockingDeque<ComparableKeysByBuyerCreateTimeOrderId> comparableKeysByBuyerCreateTimeOrderId = new LinkedBlockingDeque<>(RaceConf.INMEMORYMAXQUEUESIZE);
     public static final LinkedBlockingDeque<ComparableKeysByGoodOrderId> comparableKeysByGoodOrderId = new LinkedBlockingDeque<>(RaceConf.INMEMORYMAXQUEUESIZE);
 
+    public static final LinkedBlockingDeque<OrderLineWithDiskLoc> originalOrderLineWithDisklocQueues = new LinkedBlockingDeque<>(RaceConf.INMEMORY_MAX_ORIGINAL_ORDERLINE);
+
     /**
      * 获得队列状态信息
      * @return
@@ -30,6 +33,7 @@ public class DiskLocQueues {
         sb.append(", orderId: ").append(comparableKeysByOrderId.size());
         sb.append(", buyerCreateTimeOrder: ").append(comparableKeysByBuyerCreateTimeOrderId.size());
         sb.append(", goodOrder: ").append(comparableKeysByGoodOrderId.size());
+        sb.append(", originalOrderLineWithDisklocQueues: ").append(originalOrderLineWithDisklocQueues.size());
         return sb.toString();
     }
 }

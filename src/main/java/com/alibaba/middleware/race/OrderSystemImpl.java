@@ -34,6 +34,10 @@ public class OrderSystemImpl implements OrderSystem {
     final AtomicLong queryOrderByGoodCount = new AtomicLong(0);
 
     private CountDownLatch indexDoneSignal;
+    /**
+     * 还有多少orderdecode 线程在执行
+     */
+    private AtomicInteger nOrderDecodeThreadRemain;
 
     //根据三个表里面的主键查询
 
@@ -138,17 +142,21 @@ public class OrderSystemImpl implements OrderSystem {
             }).start();
 
         }
+        int nOrderDecodeThread = RaceConf.N_ORDER_LINE_DECOD_THREAD;
+        nOrderDecodeThreadRemain = new AtomicInteger(nOrderDecodeThread);
+        for(int i = 0;i<nOrderDecodeThread;i++){
+            new Thread(new OrderLineCosumerThread(nOrderRemain,nOrderDecodeThreadRemain)).start();
+        }
 
         /**
          * 五个创建索引线程
          */
-
         indexDoneSignal = new CountDownLatch(5);
         new Thread(new BuyerPartionBuildThread(nBuyerRemain,indexDoneSignal)).start();
-        new Thread(new BuyerTimeOrderPartionBuildThread(nOrderRemain,indexDoneSignal)).start();
+        new Thread(new BuyerTimeOrderPartionBuildThread(nOrderDecodeThreadRemain,indexDoneSignal)).start();
         new Thread(new GoodPartionBuildThread(nGoodRemain,indexDoneSignal)).start();
-        new Thread(new GoodOrderPartionBuildThread(nOrderRemain,indexDoneSignal)).start();
-        new Thread(new OrderIdPartionBuildThread(nOrderRemain,indexDoneSignal)).start();
+        new Thread(new GoodOrderPartionBuildThread(nOrderDecodeThreadRemain,indexDoneSignal)).start();
+        new Thread(new OrderIdPartionBuildThread(nOrderDecodeThreadRemain,indexDoneSignal)).start();
         /**
          * For debug
          */
