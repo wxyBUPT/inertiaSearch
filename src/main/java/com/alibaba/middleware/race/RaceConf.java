@@ -32,7 +32,7 @@ public class RaceConf {
      */
 
     //一个index 保存最大的索引量
-    public static final int INDEXNODEMAXSIZE = 600;
+    public static final int INDEXNODEMAXSIZE = 480;
     /**
      * 内存中索引存储最多key 的数量
      */
@@ -106,14 +106,14 @@ public class RaceConf {
     /**
      * 根据 hash 分片个个数
      */
-    public static final Integer N_PARTITION = 4096;
+    public static final Integer N_PARTITION = 5120;
 
     /**
      * 一个partion中有两个保存keys的arrayList用作cache,
      */
-    public static final Integer PARTITION_CACHE_COUNT = 1200;
+    public static final Integer PARTITION_CACHE_COUNT = 960;
 
-    public static final Integer PARTITION_BTREE_BUILD_CONCURRENT = 48;
+    public static final Integer PARTITION_BTREE_BUILD_CONCURRENT = 12;
     /**
      * 在查询阶段,专门用来创建b 树的线程需要"死"多少
      */
@@ -122,7 +122,7 @@ public class RaceConf {
     /**
      * 解码orderline 的线程数量
      */
-    public static final Integer N_ORDER_LINE_DECOD_THREAD = 3;
+    public static final Integer N_ORDER_LINE_DECOD_THREAD = 2;
 
     public static void main(String[] args){
         int TESTCOUNT = 1200;
