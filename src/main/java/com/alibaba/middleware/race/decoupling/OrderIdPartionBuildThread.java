@@ -1,10 +1,11 @@
 package com.alibaba.middleware.race.decoupling;
 
+import com.alibaba.middleware.race.RaceConf;
 import com.alibaba.middleware.race.codec.HashKeyHash;
 import com.alibaba.middleware.race.models.comparableKeys.ComparableKeysByOrderId;
 import com.alibaba.middleware.race.storage.IndexPartition;
 
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -26,10 +27,25 @@ public class OrderIdPartionBuildThread extends PartionBuildThread<ComparableKeys
         myPartions.get(hashCode).addKey(comparableKeysByOrderId);
     }
 
+    /**
+     * 重构,按照partion 的数目分为多路执行
+     */
     @Override
     protected void createBPlusTree() {
-        for(Map.Entry<Integer,IndexPartition<ComparableKeysByOrderId>> entry:myPartions.entrySet()){
-            entry.getValue().merageAndBuildMe();
+        List<Collection<IndexPartition<ComparableKeysByOrderId>>>
+                partionsList = split(myPartions);
+
+        int len = partionsList.size();
+        CountDownLatch doneSingle = new CountDownLatch(len);
+        for(Collection<IndexPartition<ComparableKeysByOrderId>> partitions:partionsList){
+            new Thread(
+                    new MergeBuildBTreeThread<>(partitions,doneSingle)
+            ).start();
+        }
+        try {
+            doneSingle.await();
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 }

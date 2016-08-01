@@ -55,9 +55,9 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
      * 两个用于添加数据和排序的ArrayList
      * 每一个partion 会启动新的线程排序,并将排序后的索引添加到磁盘,并不会阻塞数据插入线程
      */
-    private LinkedBlockingQueue<List<T>> keysCacheQueue;
+    private LinkedBlockingQueue<Vector<T>> keysCacheQueue;
 
-    public List<T> currentCache;
+    public Vector<T> currentCache;
     /**
      * 当前缓存中有多少个元素
      */
@@ -90,8 +90,8 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
          */
         keysCacheQueue = new LinkedBlockingQueue<>(1);
         try {
-            keysCacheQueue.add(new ArrayList<T>(RaceConf.PARTITION_CACHE_COUNT));
-            currentCache = new ArrayList<>(RaceConf.PARTITION_CACHE_COUNT);
+            keysCacheQueue.add(new Vector<T>(RaceConf.PARTITION_CACHE_COUNT));
+            currentCache = new Vector<>(RaceConf.PARTITION_CACHE_COUNT);
         }catch (Exception e){
             e.printStackTrace();System.exit(-1);
         }
@@ -127,7 +127,7 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
             /**
              * 将数据放到戴排序的队列中,等待外部排序线程排序
              */
-            List<T> tmp = currentCache;
+            Vector<T> tmp = currentCache;
             try {
                 currentCache = keysCacheQueue.take();
                 elementCount = 0;
@@ -142,15 +142,15 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
     }
 
     class SortThread implements Runnable{
-        List<T> cache;
-        SortThread(List<T> cache){
+        Vector<T> cache;
+        SortThread(Vector<T> cache){
             this.cache = cache;
         }
         @Override
         public void run() {
             List<T> sortedList = shellSort.shellsort(cache);
             sortedKeysInDisk.add(flushUtil.moveListDataToDisk(sortedList));
-            keysCacheQueue.offer(new ArrayList<T>(RaceConf.PARTITION_CACHE_COUNT));
+            keysCacheQueue.offer(new Vector<T>(RaceConf.PARTITION_CACHE_COUNT));
         }
     }
 
@@ -163,6 +163,10 @@ public class IndexPartition<T extends Comparable<? super T> & Serializable & Ind
         /**
          * 清空当前缓存队列到硬盘中,因为有两个缓存队列,一个在另外的线程中执行,所以写下面的代码出现bug 的可能性比较大
          */
+        if(rootIndex!=null){
+            LOG.info("查询阶段已经帮助创建b树,所以不用创建");
+            return ;
+        }
         List<T> sortedList = shellSort.shellsort(currentCache);
         sortedKeysInDisk.add(flushUtil.moveListDataToDisk(sortedList));
         /**

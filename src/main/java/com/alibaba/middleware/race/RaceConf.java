@@ -107,6 +107,8 @@ public class RaceConf {
      */
     public static final Integer PARTITION_CACHE_COUNT = 1200;
 
+    public static final Integer PARTITION_BTREE_BUILD_CONCURRENT = 6;
+
     public static void main(String[] args){
         int TESTCOUNT = 1200;
         IndexLeafNode<ComparableKeysByBuyerCreateTimeOrderId> inIndexLeafNode =

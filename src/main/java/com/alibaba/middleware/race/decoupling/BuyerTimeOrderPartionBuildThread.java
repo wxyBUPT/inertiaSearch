@@ -4,7 +4,9 @@ import com.alibaba.middleware.race.codec.HashKeyHash;
 import com.alibaba.middleware.race.models.comparableKeys.ComparableKeysByBuyerCreateTimeOrderId;
 import com.alibaba.middleware.race.storage.IndexPartition;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -29,8 +31,19 @@ public class BuyerTimeOrderPartionBuildThread extends  PartionBuildThread<Compar
 
     @Override
     protected void createBPlusTree() {
-        for(Map.Entry<Integer,IndexPartition<ComparableKeysByBuyerCreateTimeOrderId>> entry:myPartions.entrySet()){
-            entry.getValue().merageAndBuildMe();
+        List<Collection<IndexPartition<ComparableKeysByBuyerCreateTimeOrderId>>>
+                partionsList = split(myPartions);
+        int len = partionsList.size();
+        CountDownLatch donSingle = new CountDownLatch(len);
+        for(Collection<IndexPartition<ComparableKeysByBuyerCreateTimeOrderId>> partitions:partionsList){
+            new Thread(
+                    new MergeBuildBTreeThread<>(partitions,donSingle)
+            ).start();
+        }
+        try{
+            donSingle.await();
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 }

@@ -3,6 +3,7 @@ package com.alibaba.middleware.race.decoupling;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Vector;
 
 /**
  * Created by xiyuanbupt on 7/29/16.
@@ -13,7 +14,7 @@ public class ShellSort <T extends Comparable<? super T>>{
      * @param input
      * @return
      */
-    public List<T> shellsort(List<T> input){
+    public List<T> shellsort(Vector<T> input){
         int size = input.size();
         int j;
         for(int dk = size/2; dk>=1;dk = dk/2){
@@ -49,17 +50,5 @@ public class ShellSort <T extends Comparable<? super T>>{
      * @param args
      */
     public static void main(String[] args) {
-
-        ShellSort<Integer> app = new ShellSort<>();
-
-        //Generate an integer array of length 7
-        List<Integer> input = app.generateRandomNumbers(100);
-
-        //Before sort
-        System.out.println(input);
-
-        //After sort
-        System.out.println(app.shellsort(input));
-
     }
 }

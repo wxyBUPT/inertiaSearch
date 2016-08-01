@@ -1,11 +1,13 @@
 package com.alibaba.middleware.race.decoupling;
 
+import com.alibaba.middleware.race.RaceConf;
+import com.alibaba.middleware.race.models.comparableKeys.ComparableKeysByOrderId;
 import com.alibaba.middleware.race.storage.IndexNameSpace;
 import com.alibaba.middleware.race.storage.IndexPartition;
 import com.alibaba.middleware.race.storage.Indexable;
 
 import java.io.Serializable;
-import java.util.HashMap;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
@@ -104,6 +106,36 @@ public abstract class PartionBuildThread <T extends Comparable<? super T> & Seri
     private void insertKeys(T key){
         totalInsertCount++;
         putIndexToPartion(key);
+    }
+
+    /**
+     * 根据输入的partion map 将,partion 分成不同的组
+     * @param partitionHashMap
+     * @return
+     */
+    protected List<Collection<IndexPartition<T>>> split(HashMap<Integer,IndexPartition<T>> partitionHashMap){
+        Collection<IndexPartition<T>> partitions = partitionHashMap.values();
+        List<Collection<IndexPartition<T>>> res = new LinkedList<>();
+        /**
+         * 一个线程中构建多少个partion
+         */
+        int nPartions = partitions.size()/ RaceConf.PARTITION_BTREE_BUILD_CONCURRENT + 1;
+        /**
+         * 当前有多少个partion
+         */
+        int currentPartionCount= 0;
+        Collection<IndexPartition<T>> currentPartions = new Vector<>(nPartions);
+        for(IndexPartition<T> partition:partitions){
+            if(currentPartionCount >= nPartions){
+                res.add(currentPartions);
+                currentPartionCount = 0;
+                currentPartions = new Vector<>(nPartions);
+            }
+            currentPartions.add(partition);
+            currentPartionCount ++;
+        }
+        res.add(currentPartions);
+        return res;
     }
 
     protected abstract void putIndexToPartion(T t);
