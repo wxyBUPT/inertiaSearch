@@ -32,20 +32,8 @@ public class OrderIdPartionBuildThread extends PartionBuildThread<ComparableKeys
      */
     @Override
     protected void createBPlusTree() {
-        List<Collection<IndexPartition<ComparableKeysByOrderId>>>
-                partionsList = split(myPartions);
-
-        int len = partionsList.size();
-        CountDownLatch doneSingle = new CountDownLatch(len);
-        for(Collection<IndexPartition<ComparableKeysByOrderId>> partitions:partionsList){
-            new Thread(
-                    new MergeBuildBTreeThread<>(partitions,doneSingle)
-            ).start();
-        }
-        try {
-            doneSingle.await();
-        }catch (Exception e){
-            e.printStackTrace();
+        for(Map.Entry<Integer,IndexPartition<ComparableKeysByOrderId>> entry:myPartions.entrySet()){
+            entry.getValue().merageAndBuildMe();
         }
     }
 }

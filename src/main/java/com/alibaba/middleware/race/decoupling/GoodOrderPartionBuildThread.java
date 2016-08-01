@@ -6,6 +6,7 @@ import com.alibaba.middleware.race.storage.IndexPartition;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -31,19 +32,8 @@ public class GoodOrderPartionBuildThread extends PartionBuildThread<ComparableKe
      */
     @Override
     protected void createBPlusTree() {
-        List<Collection<IndexPartition<ComparableKeysByGoodOrderId>>>
-                partionsList = split(myPartions);
-        int len = partionsList.size();
-        CountDownLatch donSingle = new CountDownLatch(len);
-        for(Collection<IndexPartition<ComparableKeysByGoodOrderId>> partitions:partionsList){
-            new Thread(
-                    new MergeBuildBTreeThread<>(partitions,donSingle)
-            ).start();
-        }
-        try{
-            donSingle.await();
-        }catch (Exception e){
-            e.printStackTrace();
+        for(Map.Entry<Integer,IndexPartition<ComparableKeysByGoodOrderId>> entry: myPartions.entrySet()){
+            entry.getValue().merageAndBuildMe();
         }
     }
 }

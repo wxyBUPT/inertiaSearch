@@ -18,7 +18,7 @@ public class GoodIndexPartion extends IndexPartition<ComparableKeysByGoodId>{
          * 不适用lru 队列,因为数据量特别小,所以所有节点都会被缓存
          */
         myLRU = null;
-        myCache = new HashMap<>(3);
+        myCache = new HashMap<>(2);
     }
 
     @Override

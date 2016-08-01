@@ -31,19 +31,8 @@ public class BuyerTimeOrderPartionBuildThread extends  PartionBuildThread<Compar
 
     @Override
     protected void createBPlusTree() {
-        List<Collection<IndexPartition<ComparableKeysByBuyerCreateTimeOrderId>>>
-                partionsList = split(myPartions);
-        int len = partionsList.size();
-        CountDownLatch donSingle = new CountDownLatch(len);
-        for(Collection<IndexPartition<ComparableKeysByBuyerCreateTimeOrderId>> partitions:partionsList){
-            new Thread(
-                    new MergeBuildBTreeThread<>(partitions,donSingle)
-            ).start();
-        }
-        try{
-            donSingle.await();
-        }catch (Exception e){
-            e.printStackTrace();
+        for(Map.Entry<Integer,IndexPartition<ComparableKeysByBuyerCreateTimeOrderId>> entry:myPartions.entrySet()){
+            entry.getValue().merageAndBuildMe();
         }
     }
 }

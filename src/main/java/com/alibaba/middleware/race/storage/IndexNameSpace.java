@@ -47,7 +47,7 @@ public class IndexNameSpace {
     /**
      * 加入buyer 和 good
      */
-    public static HashMap<Integer,IndexPartition<ComparableKeysByBuyerId>> mBuyer;
+    public static HashMap<Integer,BuyerIndexPartion> mBuyer;
     public static HashMap<Integer,GoodIndexPartion> mGood;
 
     private IndexNameSpace(){
@@ -63,7 +63,7 @@ public class IndexNameSpace {
             mOrderPartion.put(i,new IndexPartition<ComparableKeysByOrderId>(i));
             mBuyerCreateTimeOrderPartion.put(i,new IndexPartition<ComparableKeysByBuyerCreateTimeOrderId>(i));
             mGoodOrderPartions.put(i,new IndexPartition<ComparableKeysByGoodOrderId>(i));
-            mBuyer.put(i,new IndexPartition<ComparableKeysByBuyerId>(i));
+            mBuyer.put(i,new BuyerIndexPartion(i));
             mGood.put(i,new GoodIndexPartion(i));
         }
 
@@ -80,7 +80,7 @@ public class IndexNameSpace {
                     sb.append("orderPartionElementCount is : " ).append(calculatePartionTotalCount(mOrderPartion));
                     sb.append(", buyerPartionElementCount is : ").append(calculatePartionTotalCount(mBuyerCreateTimeOrderPartion));
                     sb.append(", goodPartionElementCount is : ").append(calculatePartionTotalCount(mGoodOrderPartions));
-                    sb.append(", buyerCreateTimeOrderPartionCount is : ").append(calculatePartionTotalCount(mBuyer));
+                    sb.append(", buyerCreateTimeOrderPartionCount is : ").append(calculateBuyerPartionTotalCount(mBuyer));
                     sb.append(", goodOrderPartionCount is : ").append(calculateGoodPartionTotalCount(mGood));
                     LOG.info(sb.toString());
                 }
@@ -100,6 +100,14 @@ public class IndexNameSpace {
         Long count = 0L;
         for(Map.Entry<Integer,GoodIndexPartion> entry:partionHashMap.entrySet()){
             count+=entry.getValue().getTotalCount();
+        }
+        return count;
+    }
+
+    private Long calculateBuyerPartionTotalCount(HashMap<Integer,BuyerIndexPartion> partionHashMap){
+        Long count = 0L;
+        for(Map.Entry<Integer,BuyerIndexPartion> entry:partionHashMap.entrySet()){
+            count += entry.getValue().getTotalCount();
         }
         return count;
     }

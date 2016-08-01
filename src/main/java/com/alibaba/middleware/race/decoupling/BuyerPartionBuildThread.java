@@ -2,6 +2,7 @@ package com.alibaba.middleware.race.decoupling;
 
 import com.alibaba.middleware.race.codec.HashKeyHash;
 import com.alibaba.middleware.race.models.comparableKeys.ComparableKeysByBuyerId;
+import com.alibaba.middleware.race.storage.BuyerIndexPartion;
 import com.alibaba.middleware.race.storage.IndexPartition;
 
 import java.util.HashMap;
@@ -14,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class BuyerPartionBuildThread extends PartionBuildThread<ComparableKeysByBuyerId>{
 
-    private HashMap<Integer,IndexPartition<ComparableKeysByBuyerId>> myPartions;
+    private HashMap<Integer,BuyerIndexPartion> myPartions;
 
     @Override
     protected void putIndexToPartion(ComparableKeysByBuyerId comparableKeysByBuyerId) {
@@ -24,7 +25,7 @@ public class BuyerPartionBuildThread extends PartionBuildThread<ComparableKeysBy
 
     @Override
     protected void createBPlusTree() {
-        for(Map.Entry<Integer,IndexPartition<ComparableKeysByBuyerId>> entry:myPartions.entrySet()){
+        for(Map.Entry<Integer,BuyerIndexPartion> entry:myPartions.entrySet()){
             entry.getValue().merageAndBuildMe();
         }
     }
