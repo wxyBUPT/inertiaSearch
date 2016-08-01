@@ -42,7 +42,6 @@ public class OrderSystemImpl implements OrderSystem {
     //根据三个表里面的主键查询
 
 
-    private FileManager fileManager;
     private IndexNameSpace indexNameSpace;
     CountDownLatch doneSignal;
 
@@ -78,12 +77,11 @@ public class OrderSystemImpl implements OrderSystem {
      */
     @Override
     public void construct(final Collection<String> orderFiles, final Collection<String> buyerFiles, final Collection<String> goodFiles, final Collection<String> storeFolders) throws IOException, InterruptedException {
-        LOG.info("这是一个构建需要两个小时的版本");
-        /**
-         * 三个文件一个线程
-         */
 
-        final FileManager fileManager = FileManager.getInstance(storeFolders, nameSpace);
+        /**
+         * 下面一行无论如何不应该被删除,在程序初始化的时候为单例传递参数
+         */
+        final FileManager fileManager = FileManager.getInstance(storeFolders,nameSpace);
         /**
          * 将文件按照不同的存储目录区分
          */
@@ -105,11 +103,10 @@ public class OrderSystemImpl implements OrderSystem {
 
 
         for(int i = 0;i<storeFolders.size();i++){
-            /**
-             * 用于记录启动了多少线程
-             */
-            int nThread = 0;
 
+            /**
+             * 单纯是为了打日志
+             */
             StringBuilder sb = new StringBuilder();
             final Collection<String> buyerFilesforInsert = splitedBuyerFiles.get(i);
             sb.append("BuyerFiles: ").append(buyerFilesforInsert).append(", ");
@@ -119,6 +116,9 @@ public class OrderSystemImpl implements OrderSystem {
             sb.append("OrderFiles: ").append(orderFilesforInsert).append(", handled in this thread");
             LOG.info(sb.toString());
 
+            /**
+             * 三个线程顺序处理文件
+             */
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -142,6 +142,10 @@ public class OrderSystemImpl implements OrderSystem {
             }).start();
 
         }
+
+        /**
+         * 创建order decode 线程
+         */
         int nOrderDecodeThread = RaceConf.N_ORDER_LINE_DECOD_THREAD;
         nOrderDecodeThreadRemain = new AtomicInteger(nOrderDecodeThread);
         for(int i = 0;i<nOrderDecodeThread;i++){
@@ -175,7 +179,6 @@ public class OrderSystemImpl implements OrderSystem {
         //}).start();
 
         indexDoneSignal.await(59,TimeUnit.MINUTES);
-        doneSignal.await(1, TimeUnit.MINUTES);
         LOG.info("Finish copy file. It means all origin file have moved to disk");
         LOG.info("FINISHINDEX , finish create all index. ");
         //fileManager.finishConstruct();

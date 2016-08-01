@@ -63,7 +63,6 @@ public class OrderLineCosumerThread implements Runnable{
                 handleLine(line,diskLoc);
             }catch (Exception e){
                 e.printStackTrace();
-                System.exit(-1);
             }
         }
         /**
@@ -71,6 +70,7 @@ public class OrderLineCosumerThread implements Runnable{
          */
         nThreadRemain.decrementAndGet();
     }
+
     private void handleLine(String line, DiskLoc diskLoc) throws IOException,OrderSystem.TypeException,InterruptedException{
         /**
          * 处理行数据
