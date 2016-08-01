@@ -88,28 +88,22 @@ public class OrderSystemImpl implements OrderSystem {
         final Vector<Collection<String>> splitedGoodFiles = spliter(goodFiles, storeFolders);
 
         /**
-         * 启动三个线程,每一个线程负责处理一类文件
-         */
-
-        int nThread = 3;
-
-        /**
          * IndexExtentManager is a singleton , init it use paramter
          */
         IndexExtentManager.getInstance();
         FileManager.getInstance(storeFolders,nameSpace);
         indexNameSpace = IndexNameSpace.getInstance();
 
-        /**
-         * set countdownlatch,wait all file read finish
-         */
-        doneSignal = new CountDownLatch(nThread);
-
-        final AtomicInteger nOrderRemain = new AtomicInteger(3);
-        final AtomicInteger nGoodRemain = new AtomicInteger(3);
-        final AtomicInteger nBuyerRemain = new AtomicInteger(3);
+        final AtomicInteger nOrderRemain = new AtomicInteger(0);
+        final AtomicInteger nGoodRemain = new AtomicInteger(0);
+        final AtomicInteger nBuyerRemain = new AtomicInteger(0);
 
         for(int i = 0;i<storeFolders.size();i++){
+            /**
+             * 用于记录启动了多少线程
+             */
+            int nThread = 0;
+
             StringBuilder sb = new StringBuilder();
             final Collection<String> buyerFilesforInsert = splitedBuyerFiles.get(i);
             sb.append("BuyerFiles: ").append(buyerFilesforInsert).append(", ");
@@ -118,30 +112,69 @@ public class OrderSystemImpl implements OrderSystem {
             sb.append("GoodFIles: ").append(goodFilesforInsert).append(", ");
             sb.append("OrderFiles: ").append(orderFilesforInsert).append(", handled in this thread");
             LOG.info(sb.toString());
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-
-                        new BuyerFileHandler().handle(buyerFilesforInsert);
-                        nBuyerRemain.decrementAndGet();
-
-                        new GoodFileHandler().handle(goodFilesforInsert);
-                        nGoodRemain.decrementAndGet();
-
-                        new OrderFileHandler().handle(orderFilesforInsert);
-                        nOrderRemain.decrementAndGet();
-
-                        /**
-                         * 三类文件都处理完毕
-                         */
-                        doneSignal.countDown();
-
-                    }catch (Exception e){
-                        e.printStackTrace();
+            /**
+             * 每个文件夹下面的文件再两个文件两个文件一组,每一组开启一个数据处理线程
+             */
+            final Vector<Collection<String>> buyerFilesDivideBy2 = fileDivideByN(buyerFilesforInsert,2);
+            final Vector<Collection<String>> goodFilesDivideBy2 = fileDivideByN(goodFilesforInsert,2);
+            final Vector<Collection<String>> orderFilesDivideBy2 = fileDivideByN(orderFilesforInsert,2);
+            /**
+             * 开始处理本文件夹中的buyer 文件
+             */
+            for(final Collection<String> files:buyerFilesDivideBy2){
+                LOG.info("Handle files: " + files);
+                nBuyerRemain.incrementAndGet();
+                nThread ++;
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            new BuyerFileHandler().handle(files);
+                            nBuyerRemain.decrementAndGet();
+                            doneSignal.countDown();
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
                     }
-                }
-            }).start();
+                }).start();
+            }
+
+            for(final Collection<String> files:goodFilesDivideBy2){
+                nThread ++;
+                LOG.info("Handle files: " + files);
+                nGoodRemain.incrementAndGet();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try{
+                            new GoodFileHandler().handle(files);
+                            nGoodRemain.decrementAndGet();
+                            doneSignal.countDown();
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+            }
+
+            for(final Collection<String> files: orderFilesDivideBy2){
+                nThread ++;
+                LOG.info("Handle files: " + files);
+                nOrderRemain.incrementAndGet();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            new OrderFileHandler().handle(files);
+                            nOrderRemain.decrementAndGet();
+                            doneSignal.countDown();
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+            }
+            doneSignal = new CountDownLatch(nThread);
         }
 
         /**
@@ -268,6 +301,29 @@ public class OrderSystemImpl implements OrderSystem {
             }
             res.add(currentFiles);
         }
+        return res;
+    }
+
+    /**
+     * 将一组文件分为每一组n 个的文件vector
+     * @param files
+     * @param n
+     * @return
+     */
+    private Vector<Collection<String>> fileDivideByN(Collection<String> files,int n){
+        Vector<Collection<String>> res  = new Vector<>();
+        ArrayList<String> currentFiles = new ArrayList<>();
+        int currentFilesCount = 0;
+        for(String file:files){
+            if(currentFilesCount==n){
+                res.add(currentFiles);
+                currentFiles = new ArrayList<>();
+                currentFilesCount = 0;
+            }
+            currentFilesCount ++;
+            currentFiles.add(file);
+        }
+        res.add(currentFiles);
         return res;
     }
 
