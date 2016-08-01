@@ -32,7 +32,7 @@ public class RaceConf {
      */
 
     //一个index 保存最大的索引量
-    public static final int INDEXNODEMAXSIZE = 480;
+    public static final int INDEXNODEMAXSIZE = 640;
     /**
      * 内存中索引存储最多key 的数量
      */
@@ -88,11 +88,6 @@ public class RaceConf {
      */
 
     /**
-     * 下面两个都是每一个partion 缓存indexnode 的数量.
-     * 如果两个参数都是20 的话,可能所有index 节点都会被缓存
-     */
-    public static final Integer N_GOOD_INDEX_CACHE_COUNT = 20;
-    /**
      * buyer good index 缓存的数量,因为buyer 的数量要多一点,故不全部存储于内存
      */
     public static final Integer N_BUYER_INDEX_CACHE_COUNT = 20;
@@ -111,7 +106,7 @@ public class RaceConf {
     /**
      * 一个partion中有两个保存keys的arrayList用作cache,
      */
-    public static final Integer PARTITION_CACHE_COUNT = 960;
+    public static final Integer PARTITION_CACHE_COUNT = 1280;
 
     public static final Integer PARTITION_BTREE_BUILD_CONCURRENT = 12;
     /**

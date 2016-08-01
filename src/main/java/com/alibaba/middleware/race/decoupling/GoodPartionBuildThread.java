@@ -2,6 +2,7 @@ package com.alibaba.middleware.race.decoupling;
 
 import com.alibaba.middleware.race.codec.HashKeyHash;
 import com.alibaba.middleware.race.models.comparableKeys.ComparableKeysByGoodId;
+import com.alibaba.middleware.race.storage.GoodIndexPartion;
 import com.alibaba.middleware.race.storage.IndexPartition;
 
 import java.util.HashMap;
@@ -16,6 +17,7 @@ public class GoodPartionBuildThread extends PartionBuildThread<ComparableKeysByG
 
 
 
+    private HashMap<Integer,GoodIndexPartion> myPartions;
     public GoodPartionBuildThread(AtomicInteger nRemain, CountDownLatch sendFinishSingle){
         super(nRemain,sendFinishSingle);
         this.keysQueue = DiskLocQueues.comparableKeysByGoodIdQueue;
@@ -30,7 +32,7 @@ public class GoodPartionBuildThread extends PartionBuildThread<ComparableKeysByG
 
     @Override
     protected void createBPlusTree() {
-        for(Map.Entry<Integer,IndexPartition<ComparableKeysByGoodId>> entry:myPartions.entrySet()){
+        for(Map.Entry<Integer,GoodIndexPartion> entry:myPartions.entrySet()){
             /**
              * 在partion 中创建btree
              */
