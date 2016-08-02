@@ -15,7 +15,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class BuyerPartionBuildThread extends PartionBuildThread<ComparableKeysByBuyerId>{
 
-    private HashMap<Integer,BuyerIndexPartion> myPartions;
 
     @Override
     protected void putIndexToPartion(ComparableKeysByBuyerId comparableKeysByBuyerId) {
@@ -25,7 +24,7 @@ public class BuyerPartionBuildThread extends PartionBuildThread<ComparableKeysBy
 
     @Override
     protected void createBPlusTree() {
-        for(Map.Entry<Integer,BuyerIndexPartion> entry:myPartions.entrySet()){
+        for(Map.Entry<Integer,IndexPartition<ComparableKeysByBuyerId>> entry:myPartions.entrySet()){
             entry.getValue().merageAndBuildMe();
         }
     }

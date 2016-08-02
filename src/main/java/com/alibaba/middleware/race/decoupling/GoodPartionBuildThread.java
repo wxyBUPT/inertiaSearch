@@ -17,7 +17,6 @@ public class GoodPartionBuildThread extends PartionBuildThread<ComparableKeysByG
 
 
 
-    private HashMap<Integer,GoodIndexPartion> myPartions;
     public GoodPartionBuildThread(AtomicInteger nRemain, CountDownLatch sendFinishSingle){
         super(nRemain,sendFinishSingle);
         this.keysQueue = DiskLocQueues.comparableKeysByGoodIdQueue;
@@ -32,7 +31,7 @@ public class GoodPartionBuildThread extends PartionBuildThread<ComparableKeysByG
 
     @Override
     protected void createBPlusTree() {
-        for(Map.Entry<Integer,GoodIndexPartion> entry:myPartions.entrySet()){
+        for(Map.Entry<Integer,IndexPartition<ComparableKeysByGoodId>> entry:myPartions.entrySet()){
             /**
              * 在partion 中创建btree
              */

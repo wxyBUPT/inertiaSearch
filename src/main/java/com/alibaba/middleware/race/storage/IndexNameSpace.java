@@ -47,8 +47,8 @@ public class IndexNameSpace {
     /**
      * 加入buyer 和 good
      */
-    public static HashMap<Integer,BuyerIndexPartion> mBuyer;
-    public static HashMap<Integer,GoodIndexPartion> mGood;
+    public static HashMap<Integer,IndexPartition<ComparableKeysByBuyerId>> mBuyer;
+    public static HashMap<Integer,IndexPartition<ComparableKeysByGoodId>> mGood;
 
     private IndexNameSpace(){
         /**
@@ -63,8 +63,8 @@ public class IndexNameSpace {
             mOrderPartion.put(i,new IndexPartition<ComparableKeysByOrderId>(i));
             mBuyerCreateTimeOrderPartion.put(i,new IndexPartition<ComparableKeysByBuyerCreateTimeOrderId>(i));
             mGoodOrderPartions.put(i,new IndexPartition<ComparableKeysByGoodOrderId>(i));
-            mBuyer.put(i,new BuyerIndexPartion(i));
-            mGood.put(i,new GoodIndexPartion(i));
+            mBuyer.put(i,new IndexPartition<ComparableKeysByBuyerId>(i));
+            mGood.put(i,new IndexPartition<ComparableKeysByGoodId>(i));
         }
 
         new Thread(new Runnable() {
@@ -80,8 +80,8 @@ public class IndexNameSpace {
                     sb.append("orderPartionElementCount is : " ).append(calculatePartionTotalCount(mOrderPartion));
                     sb.append(", buyerPartionElementCount is : ").append(calculatePartionTotalCount(mBuyerCreateTimeOrderPartion));
                     sb.append(", goodPartionElementCount is : ").append(calculatePartionTotalCount(mGoodOrderPartions));
-                    sb.append(", buyerCreateTimeOrderPartionCount is : ").append(calculateBuyerPartionTotalCount(mBuyer));
-                    sb.append(", goodOrderPartionCount is : ").append(calculateGoodPartionTotalCount(mGood));
+                    sb.append(", buyerCreateTimeOrderPartionCount is : ").append(calculatePartionTotalCount(mBuyer));
+                    sb.append(", goodOrderPartionCount is : ").append(calculatePartionTotalCount(mGood));
                     LOG.info(sb.toString());
                 }
             }
