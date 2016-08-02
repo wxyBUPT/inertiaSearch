@@ -7,8 +7,6 @@ import com.alibaba.middleware.race.models.comparableKeys.ComparableKeysByGoodOrd
 import com.alibaba.middleware.race.models.comparableKeys.ComparableKeysByOrderId;
 import com.alibaba.middleware.race.storage.DiskLoc;
 import com.alibaba.middleware.race.storage.IndexLeafNode;
-import com.alibaba.middleware.race.storage.IndexPartition;
-import com.alibaba.middleware.race.storage.StoreType;
 
 /**
  * Created by xiyuanbupt on 7/10/16.
@@ -32,7 +30,7 @@ public class RaceConf {
      */
 
     //一个index 保存最大的索引量
-    public static final int INDEXNODEMAXSIZE = 480;
+    public static final int INDEXNODEMAXSIZE = 600;
     /**
      * 内存中索引存储最多key 的数量
      */
@@ -101,12 +99,12 @@ public class RaceConf {
     /**
      * 根据 hash 分片个个数
      */
-    public static final Integer N_PARTITION = 5120;
+    public static final Integer N_PARTITION = 4096;
 
     /**
      * 一个partion中有两个保存keys的arrayList用作cache,
      */
-    public static final Integer PARTITION_CACHE_COUNT = 960;
+    public static final Integer PARTITION_CACHE_COUNT = 1200;
 
     public static final Integer PARTITION_BTREE_BUILD_CONCURRENT = 12;
     /**
