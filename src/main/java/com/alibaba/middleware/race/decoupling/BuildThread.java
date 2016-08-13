@@ -14,7 +14,9 @@ import java.util.logging.Logger;
 
 /**
  * Created by xiyuanbupt on 7/20/16.
- * BuildThread 会记录不同分片的
+ * BuildThread 是索引创建的第一个版本,没有在本项目中使用
+ * 线程的功能是从待处理的index 队列中取出index,有序插入到一个二叉树中,当二叉树达到一定数量
+ * 将相关的index 全部放入磁盘
  */
 public abstract class BuildThread<T extends Comparable<? super T> & Serializable & Indexable> implements Runnable{
     protected static Logger LOG = Logger.getLogger(BuildThread.class.getName());
