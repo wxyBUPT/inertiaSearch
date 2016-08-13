@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by xiyuanbupt on 7/27/16.
+ * 创建buyerId 索引
  */
 public class BuyerPartionBuildThread extends PartionBuildThread<ComparableKeysByBuyerId>{
 
