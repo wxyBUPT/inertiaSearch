@@ -1,7 +1,6 @@
 package com.alibaba.middleware.race.storage;
 
 
-import java.util.HashMap;
 import java.util.Random;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
