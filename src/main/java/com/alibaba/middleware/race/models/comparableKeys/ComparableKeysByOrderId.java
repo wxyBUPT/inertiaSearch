@@ -7,6 +7,7 @@ import java.io.Serializable;
 
 /**
  * Created by xiyuanbupt on 7/14/16.
+ * 索引
  */
 public class ComparableKeysByOrderId implements Indexable,Comparable<ComparableKeysByOrderId> ,Serializable{
 
