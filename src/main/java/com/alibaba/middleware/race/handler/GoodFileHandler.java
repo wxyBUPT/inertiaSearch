@@ -10,6 +10,7 @@ import java.io.IOException;
 
 /**
  * Created by xiyuanbupt on 7/28/16.
+ * 处理goodline
  */
 public class GoodFileHandler extends DataFileHandler{
 

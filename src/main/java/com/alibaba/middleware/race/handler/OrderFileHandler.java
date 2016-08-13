@@ -13,6 +13,7 @@ import java.io.IOException;
 /**
  * Created by xiyuanbupt on 7/28/16.
  * 8月1日重构,因为cpu 速度赶不上文件读速度,所以使用多线程处理order 数据,中间通过队列解耦
+ * 处理order 原始文件
  */
 public class OrderFileHandler extends DataFileHandler{
 

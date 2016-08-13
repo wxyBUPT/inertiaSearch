@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 
 /**
  * Created by xiyuanbupt on 7/28/16.
+ * 处理原始的数据文件,为原始的数据文件做 mmap 内存映射
  */
 public abstract class DataFileHandler{
 
