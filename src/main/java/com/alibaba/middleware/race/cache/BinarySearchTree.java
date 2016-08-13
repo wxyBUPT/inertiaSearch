@@ -5,7 +5,7 @@ import java.util.NoSuchElementException;
 
 /**
  * Created by xiyuanbupt on 7/25/16.
- * 二叉树的实现
+ * 二叉查找树的实现
  */
 public class BinarySearchTree<T extends Comparable<? super T>> implements Iterable<T>{
 
