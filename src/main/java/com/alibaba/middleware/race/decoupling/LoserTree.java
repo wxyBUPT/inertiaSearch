@@ -7,10 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * 败者树,对多个有序的数据源进行归并排序<br>
- *
- * @author skyfalling
- * @param <T>
+ * 败者树java实现,对多个有序的数据源进行归并排序<br>
  */
 public class LoserTree<T> {
     /**
