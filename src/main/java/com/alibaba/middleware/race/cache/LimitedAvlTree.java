@@ -2,6 +2,7 @@ package com.alibaba.middleware.race.cache;
 
 /**
  * Created by xiyuanbupt on 7/19/16.
+ * 元素数量优先的avl
  */
 public class LimitedAvlTree<T extends Comparable<? super T>> extends AvlTree<T > {
 
