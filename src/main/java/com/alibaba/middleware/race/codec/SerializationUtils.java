@@ -12,7 +12,6 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-
 /**
  * <p>Assists with the serialization process and performs additional functionality based
  * on serialization.</p>

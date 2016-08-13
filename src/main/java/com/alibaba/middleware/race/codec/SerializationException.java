@@ -2,6 +2,7 @@ package com.alibaba.middleware.race.codec;
 
 /**
  * Created by xiyuanbupt on 7/19/16.
+ * 这个是apache 的源码
  */
 public class SerializationException extends RuntimeException {
 
