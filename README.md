@@ -36,7 +36,7 @@
 ##程序结构
 
 *构建阶段数据处理流程*  
-![](http://7xrgjg.com1.z0.glb.clouddn.com/%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B%EF%BC%88%E6%9E%84%E5%BB%BA%EF%BC%89.png)  
+![](http://7xrgjg.com1.z0.glb.clouddn.com/%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B%EF%BC%88%E6%9E%84%E5%BB%BA%EF%BC%89.jpg)
 
 *查询阶段数据处理流程*  
 **待完成**  
