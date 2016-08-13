@@ -2,6 +2,7 @@ package com.alibaba.middleware.race.storage;
 
 /**
  * Created by xiyuanbupt on 7/19/16.
+ * 负责创建新的索引文件
  */
 
 
