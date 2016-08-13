@@ -7,6 +7,7 @@ import java.util.Vector;
 
 /**
  * Created by xiyuanbupt on 7/19/16.
+ * 继承与indexNode,b+ 树的叶子节点
  */
 public class IndexLeafNode<T extends Serializable & Comparable & Indexable> extends IndexNode<T>{
 
