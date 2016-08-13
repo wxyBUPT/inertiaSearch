@@ -5,7 +5,7 @@ import java.util.NoSuchElementException;
 
 /**
  * Created by xiyuanbupt on 7/14/16.
- *
+ * 本部分代码为一个avl 的实现但是最终没有用到最终程序中
  */
 public class AvlTree<T extends Comparable<? super T>> implements Iterable<T>{
 
