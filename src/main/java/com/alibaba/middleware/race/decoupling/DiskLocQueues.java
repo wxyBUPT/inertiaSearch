@@ -8,6 +8,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Created by xiyuanbupt on 7/18/16.
+ * 用于解耦的中间队列都在这里维护
  * 当待排序的行插入到文件之后,会在DiskLocQueues 中缓存key 值,以及对应的DiskLoc
  */
 public class DiskLocQueues {
