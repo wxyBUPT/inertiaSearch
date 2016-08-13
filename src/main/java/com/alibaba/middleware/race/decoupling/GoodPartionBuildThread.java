@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by xiyuanbupt on 7/27/16.
+ * 创建goodid 索引的线程
  */
 public class GoodPartionBuildThread extends PartionBuildThread<ComparableKeysByGoodId>{
 
