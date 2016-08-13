@@ -2,6 +2,7 @@ package com.alibaba.middleware.race.cache;
 
 /**
  * Created by xiyuanbupt on 7/24/16.
+ * 继承与lru 队列,所有放入的元素都会缓存
  */
 public class ConcurrentLruCacheForBigData<KEY,VALUE> extends ConcurrentLruCache<KEY,VALUE>{
 
