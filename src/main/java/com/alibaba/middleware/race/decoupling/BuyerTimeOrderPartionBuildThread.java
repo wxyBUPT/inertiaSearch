@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by xiyuanbupt on 7/26/16.
+ * 创建 buyerId + createTime + orderId 索引的线程
  */
 public class BuyerTimeOrderPartionBuildThread extends  PartionBuildThread<ComparableKeysByBuyerCreateTimeOrderId>{
 
