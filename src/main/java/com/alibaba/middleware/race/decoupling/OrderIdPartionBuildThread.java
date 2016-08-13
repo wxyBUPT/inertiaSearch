@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by xiyuanbupt on 7/26/16.
+ * orderid 索引创建线程
  */
 public class OrderIdPartionBuildThread extends PartionBuildThread<ComparableKeysByOrderId>{
 
