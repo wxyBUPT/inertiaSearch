@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 
 /**
  * Created by xiyuanbupt on 7/13/16.
+ * B+ 树的节点信息
  */
 abstract public class IndexNode<T extends Serializable & Comparable > implements Serializable,Iterable<T>{
 
