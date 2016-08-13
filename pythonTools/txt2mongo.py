@@ -1,5 +1,7 @@
 #coding=utf-8
 
+# 将原始文件存储到mongo 中
+
 from pymongo import MongoClient
 import json
 

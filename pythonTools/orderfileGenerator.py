@@ -1,5 +1,6 @@
 #coding=utf-8
 __author__ = 'xiyuanbupt'
+# 计算文件中出现的所有key 值
 
 from collections import defaultdict
 
