@@ -17,6 +17,8 @@ import java.util.logging.Logger;
 /**
  * Created by xiyuanbupt on 7/26/16.
  * 与buildThrea类似,但是为添加了一层hash 之后将数据插入到 indexPartion 中对应的partion
+ * 所有partionBuildThread 的基类,实现功能是使用while 从索引队列中取出单条索引信息并放到indexNameSpace
+ * 中(排序由另外的线程负责)
  */
 public abstract class PartionBuildThread <T extends Comparable<? super T> & Serializable & Indexable> implements Runnable{
 
