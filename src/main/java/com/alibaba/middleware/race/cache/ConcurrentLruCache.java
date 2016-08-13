@@ -9,6 +9,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by xiyuanbupt on 7/24/16.
+ * lru(最近最多使用) 队列的java 实现(不一定是最优)
  */
 public abstract class ConcurrentLruCache<KEY, VALUE > implements LRUCache<KEY,VALUE> {
 
