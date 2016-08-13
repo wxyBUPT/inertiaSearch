@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 
 /**
  * Created by xiyuanbupt on 7/26/16.
- * 一类 index 的一个分片,负责管理hash() 值相同的
+ * 一类 index 的一个分片,负责管理hash() 值相同的key
  * 重构之后, 很多indexNameSpace 的工作交给了partion 处理,indexNameSpace 只负责路由的功能
  */
 public class IndexPartition<T extends Comparable<? super T> & Serializable & Indexable> {

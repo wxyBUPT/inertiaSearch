@@ -7,6 +7,7 @@ import java.util.HashMap;
 
 /**
  * Created by xiyuanbupt on 8/1/16.
+ * buyerid 索引的一个"桶"
  * 继承自 indexPartion ,buyer 的索引数据量和真是数据相比真是数据小一些,因此可以
  * 尝试将buyer 的索引数据持久化到内存中
  */

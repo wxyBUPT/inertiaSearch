@@ -7,6 +7,7 @@ import java.util.HashMap;
 
 /**
  * Created by xiyuanbupt on 8/1/16.
+ * goodid 索引的分片
  * 继承自partion ,因为good 索引要比真实数据小很多,所以查询的时候需要缓存good 索引的叶子节点和
  */
 public class GoodIndexPartion extends IndexPartition<ComparableKeysByGoodId>{
