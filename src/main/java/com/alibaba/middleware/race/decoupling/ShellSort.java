@@ -7,6 +7,7 @@ import java.util.Vector;
 
 /**
  * Created by xiyuanbupt on 7/29/16.
+ * 希尔排序java 实现
  */
 public class ShellSort <T extends Comparable<? super T>>{
     /**
