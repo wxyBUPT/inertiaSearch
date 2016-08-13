@@ -5,7 +5,7 @@ import java.util.LinkedList;
 
 /**
  * Created by xiyuanbupt on 7/21/16.
- * 遍历index 的叶子节点的iterator
+ * 一个遍历index 的叶子节点的iterator
  */
 public class IndexLeafNodeIterator <T extends Comparable<? super T>> implements Iterator<T>{
 

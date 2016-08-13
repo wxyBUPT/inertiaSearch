@@ -1,7 +1,7 @@
 #inertiaSearch
 
-**本项目是我个人组队参加第二届阿里中间件性能挑战[中间件性能挑战第二季排名](https://tianchi.shuju.aliyun.com/programming/rankingList.htm?spm=0.0.0.0.rzkb9w&raceId=231533),[赛题与数据](https://tianchi.shuju.aliyun.com/programming/information.htm?spm=0.0.0.0.cclfbM&raceId=231533),使用Hash + bPlusTree + nio 实现的简单的数据库,因为单人组队和使用java
-时间不长，导致几个关键的想法没有落实(同类index 分散存储 VS 集中存储；按照题意如何减少io次数)，最终成绩为33名。但是因为程序倾注了个人很多的心血，并且有很多借鉴的地方，故在此做了一个总结**
+**本项目是单人组队参加第二届阿里中间件性能挑战[中间件性能挑战第二季排名](https://tianchi.shuju.aliyun.com/programming/rankingList.htm?spm=0.0.0.0.rzkb9w&raceId=231533),[赛题与数据](https://tianchi.shuju.aliyun.com/programming/information.htm?spm=0.0.0.0.cclfbM&raceId=231533),使用Hash + bPlusTree + nio 实现的简单的数据库,因为单人组队和使用java
+时间不长，导致几个关键的想法没有落实(同类index 分散存储 VS 集中存储；按照题意如何减少io次数)，最终成绩为33名。但是因为程序倾注了个人很多的心血，技术实现甚至能够超过排名靠前的队伍，并且有很多借鉴的地方，故在此做了一个总结**
 
 ##本项目使用到的算法包括
 
