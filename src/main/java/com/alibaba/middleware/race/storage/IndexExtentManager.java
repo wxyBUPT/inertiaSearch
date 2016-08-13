@@ -8,7 +8,7 @@ import java.util.*;
 
 /**
  * Created by xiyuanbupt on 7/19/16.
- * 负责管理所有IndexExtent
+ * 管理所有IndexExtent
  */
 public class IndexExtentManager extends ExtentManager{
 
