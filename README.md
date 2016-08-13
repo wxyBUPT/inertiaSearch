@@ -1,7 +1,7 @@
 #inertiaSearch
 
 **本项目是我个人组队参加第二届阿里中间件性能挑战[中间件性能挑战第二季排名](https://tianchi.shuju.aliyun.com/programming/rankingList.htm?spm=0.0.0.0.rzkb9w&raceId=231533),[赛题与数据](https://tianchi.shuju.aliyun.com/programming/information.htm?spm=0.0.0.0.cclfbM&raceId=231533),使用Hash + bPlusTree + nio 实现的简单的数据库,因为单人组队和使用java
-时间不长，实现方法并不适用于大量数据短时间排序，最终成绩为33名。但是因为程序倾注了个人很多的心血，并且有很多借鉴的地方，故在此做了一个总结**
+时间不长，导致几个关键的想法没有落实(同类index 分散存储 VS 集中存储；按照题意如何减少io次数)，最终成绩为33名。但是因为程序倾注了个人很多的心血，并且有很多借鉴的地方，故在此做了一个总结**
 
 ##本项目使用到的算法包括
 
@@ -38,13 +38,13 @@
 
 2016年8月13
 
-今天看了两个开源实现，其中一个能够达到前三的效果，发现简单的hash既能完成大量的查询(我依旧相信hash + bPlus能够效果更好)。代码量也很少。
+今天看了两个开源实现，其中一个能够达到前三的效果，发现简单的hash既能完成大量的查询(我依旧相信hash + bPlus能够效果更好)。 比人的代码量也很少。
 
 ###[三位北邮校友的实现](https://github.com/immortalCockroach/alibabaMiddlewareRace-s2)
 
 ####“技不如人” 的地方
 
-* 相同的hash存在文件 VS 只维护一个Current index file（2G），所有hash都顺序填入，填满了之后创建新文件（本程序）。对比之下本程序的缺点是：对于单条记录查询，在没有创建b+ 的情况下，mmap 需要大量的换页。对于范围查询，不管是否创建了b+，index 分散在大量的文件中，同样有大量的mmap 换页。而一个Hash 文件则不会有这个问题。
+* 相同的hash存在相同的文件 VS 只维护一个Current index file（2G），所有hash都顺序填入，填满了之后创建新文件（本程序）。对比之下本程序的缺点是：对于单条记录查询，在没有创建b+ 的情况下，mmap 需要大量的换页。对于范围查询，不管是否创建了b+，index 分散在大量的文件中，同样有大量的mmap 换页。而一个Hash 文件则不会有这个问题。
 * HashMap rehash有开销，所以他们的程序在缓存good 与 buyer 直接设置了大小，我虽然没有使用hash，但是可以借鉴
 * join 优化：查询一个buyer 一段时间订单的时候buyer 只查询一次 VS buyer 查询多次（本程序）。（我已经无力吐槽，和人沟通少，自己也没想到）
 * join 优化，有关key 的查询：查到key了就不在访问文件系统了 VS 访问完文件系统再做过滤(本程序！)。（没毛病！！）
