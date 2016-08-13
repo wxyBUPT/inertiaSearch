@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 /**
  * Created by xiyuanbupt on 7/11/16.
- * 记录磁盘位置信息
+ * 磁盘位置信息Bean
  * http://docs.ros.org/electric/api/mongodb/html/classmongo_1_1DiskLoc.html#a4e481c6017491a33983cb4b57c1120d8
  */
 public class DiskLoc implements Serializable{
