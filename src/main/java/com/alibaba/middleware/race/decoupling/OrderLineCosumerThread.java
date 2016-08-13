@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 /**
  * Created by xiyuanbupt on 8/1/16.
  * 消费队列中的order 信息
+ * 将order line 解析为索引并缓存到队列中
  */
 public class OrderLineCosumerThread implements Runnable{
 
