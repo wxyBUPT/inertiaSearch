@@ -1,12 +1,12 @@
 package com.alibaba.middleware.race.storage;
 
-import com.alibaba.middleware.race.RaceConf;
 
 import java.io.Serializable;
 import java.util.*;
 
 /**
  * Created by xiyuanbupt on 7/21/16.
+ * B+ 树的非叶子节点
  */
 public class IndexTreeNode<T extends Serializable & Comparable & Indexable> extends IndexNode<T> {
 
