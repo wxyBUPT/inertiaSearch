@@ -6,6 +6,7 @@ import java.util.Random;
 
 /**
  * Created by xiyuanbupt on 7/27/16.
+ * 快速排序java 实现
  */
 public class QuickSort<T extends Comparable<? super T>> {
     /**
