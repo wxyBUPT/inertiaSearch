@@ -67,7 +67,10 @@
 2016年8月26日
 *今天阿里公布了答辩相关的ppt与食品,在旺旺群上看到了看到很多选手开源了相关实现，本周末决定做最后的总结*
 
-###[GammaGo中科院_暂时未开源_第一名](https://github.com)  
+[答辩视频](https://tianchi.shuju.aliyun.com/video.htm)  
+
+###[GammaGo中科院_暂未开源_第一名](https://github.com)  
+[答辩ppt](http://yunpan.taobao.com/s/10veL8VtCS0#/)  
 
 *这个队伍使用了TeraSort，所以先对TeraSort进行简单的介绍，并添加TearSort简单的实现(./src/main/java/com/alibaba/middleware/race/decoupling/TearSort.java)*  
 
@@ -96,3 +99,8 @@ Map-Reduce 用于大规模数据集的并行运算。Map(映射) 和 Reduce(归�
 在map 阶段，每个map task 首先从分布式缓存中读取分割点，并对这些分割点建立trie 树(两层trie树，树的叶子节点保存有该节点对应的reduce task编号）。然后正式处理数据，对于每条数据，在trie 树种查找它属于的reduce task 的编号并保存起来。
 
 在reduce 阶段，每个reduce task 从每个map task 中读取其对应的数据进行局部排序，最后将 reduce task 处理后的结果按照reduce task 编号一次输出即可。
+
+####磁盘读写控制  
+
+**读：**  
+使用buff，并对磁盘加锁(即使有多个读线程，但是只有一个线程能够读)
